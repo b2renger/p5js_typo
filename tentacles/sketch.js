@@ -66,6 +66,7 @@ function setup(){
 
     gui.add(params, 'dispertion_effect')
     gui.add(params, 'orbiting_effect')
+    gui.add(params, 'bubbling_effect')
     gui.add(params, 'fireworks_effect')
     gui.add(params, 'spiky_effect')
     gui.add(params, 'curly_effect')
@@ -122,18 +123,24 @@ function mouseDragged(){
 function Tentacle(x,y,color){
     this.x =x ;
     this.y =y;
-    this.size = random(5,10);
+
+    this.minRandom = 5;
+    this.maxRandom = 10;
+
+    this.dimStep = 0.07;
+    this.size = random(this.minRandom,this.maxRandom);
     this.color = color;
     this.angle = random(360);
     this.radius = 0;
     this.noiseFactor = random(500);
     this.noiseMultiplicator = 5;
 
+
     this.draw = function(){
 
         this.radius += 1;
         this.angle = this.angle+ noise(this.noiseFactor,10)*this.noiseMultiplicator-this.noiseMultiplicator/2 ;
-        this.size -= .070;
+        this.size -= this.dimStep;
         this.noiseFactor += 0.005;
 
         fill(params.color);
@@ -148,7 +155,7 @@ function Tentacle(x,y,color){
             this.angle = random(360);
             this.radius = 0;
             this.noiseFactor = random(500);
-            this.size = random(5,10)   ;
+            this.size = random(this.minRandom,this.maxRandom)   ;
         }
     }
 
@@ -245,6 +252,23 @@ var Parameters = function(){
 
         for (var i = 0 ; i < tentacles.length ; i++){
             tentacles[i].setNoiseM(180);
+        }
+
+    }
+
+    this.bubbling_effect = function(){
+        background(0);
+        drawing = false;
+        tentacles =[];
+        this.background = [0,0,0 ]; 
+        this.color = [237,34,93];
+        this.spacing = 5   ;
+        getPoints();
+
+        for (var i = 0 ; i < tentacles.length ; i++){
+            tentacles[i].maxRandom = 15;
+            tentacles[i].minRandom = 35;
+            tentacles[i].dimStep = 0.9;
         }
 
     }
