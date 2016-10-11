@@ -7,11 +7,17 @@ var gui, params;
 
 var spots = []; // an array to store our spotlights interactive objects
 
+
+// this function loads a font, and create an array of polygons
+// a polygon being itself an array of vectors with x/y coordinates
+// in this example we will create a "spot" for each polygon from which
+// lines will be casted towards the font outline path points.
 function getPoints(){
     drawing = false;
     // create new font : we use rune
     console.log(params.font);
     f = new Rune.Font(params.font) 
+    // load the font
     f.load(function(err){     
         path = f.toPath(params.message, 0, 0, params.size) // this is a rune function
         polys = path.toPolygons({ spacing:params.spacing }) // this is anoteher handy function to get polygons coordinates

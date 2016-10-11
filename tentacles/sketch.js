@@ -1,6 +1,3 @@
-// réparer le clear
-// ajuster les parametres, peut-être mettre quelques prests ?
-
 
 var f;
 var path;
@@ -11,44 +8,29 @@ var anchorX, anchorY;
 
 var tentacles = [];
 
-function preload(){
-    // create new font
-    f = new Rune.Font("../AvenirNextLTW01-Medium.woff")
-
-    // function with callback to calculate paths etc.
-    f.load(function(err){     
-        path = f.toPath("p5*js", 0, 0, 400)
-        polys = path.toPolygons({ spacing:2 })
-        ready() 
-    })
-
-}
-
-// when updating text or some of its parameters, this function is called on regenerate
+// this function loads a font, and create an array of polygons
+// a polygon being itself an array of vectors with x/y coordinates
+// in this example we want to create a new 'tentacle' on each point on the outline
+// of the font path
 function getPoints(){
-     f.load(function(err){     
+    drawing = false;
+    // create new font : we use rune
+    console.log(params.font);
+    f = new Rune.Font(params.font) 
+    // load the font
+    f.load(function(err){       
         path = f.toPath(params.message, 0, 0, params.size)
         polys = path.toPolygons({ spacing:params.spacing })
-        
-    })
-     ready()
-}
-
-// update drawing boolean to tell that we are ready paths have loaded
-function ready(){
-    drawing = true;
-
-    for (var i=0; i < polys.length ; i++){
-           var poly = polys[i];
-
+        tentacles = [];
+        for (var i=0; i < polys.length ; i++){
+            var poly = polys[i];
             for(var j = 0; j < poly.state.vectors.length; j++) {
                 var vec = poly.state.vectors[j];
-
-                tentacles.push(new Tentacle(vec.x,vec.y, color(255)));
-
+                tentacles.push(new Tentacle(vec.x,vec.y, params.tnoiseMultiplicator, params.tminRandom, params.tmaxRandom, params.tdimStep));
             }
         }
-
+        drawing= true;
+    });
 }
 
 
@@ -61,9 +43,10 @@ function setup(){
     // create dat.gui drawer
     gui = new dat.GUI();
     // gui setup
+    var f2 = gui.addFolder('configuration / path generation');
     var f1 = gui.addFolder('real-time parameters');
-    var f2 = gui.addFolder('parameters that need regeneration of the path');
-
+    
+    // buttons for presets
     gui.add(params, 'dispertion_effect')
     gui.add(params, 'orbiting_effect')
     gui.add(params, 'bubbling_effect')
@@ -71,14 +54,20 @@ function setup(){
     gui.add(params, 'spiky_effect')
     gui.add(params, 'curly_effect')
 
+    // Configuration parameters
+    // font selector
+    f2.add(params, 'font', {Avenir : "../fonts/AvenirNextLTW01-Medium.woff", BlackOpsOne : "../fonts/Black_Ops_One/BlackOpsOne-Regular.ttf",
+                            Comfortaa : "../fonts/Comfortaa/Comfortaa-Bold.ttf",
+                            NovaMono : "../fonts/Nova_Mono/NovaMono.ttf", ShadowsIntoLight : "../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf", 
+                            Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
+                            UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
     f2.add(params, 'message');
     f2.add(params, 'spacing', 1, 25);
-    f2.add(params, 'size', 100, 400);
+    f2.add(params, 'size', 100, 1000);
     f2.add(params, 'regenerate');
 
     f1.addColor(params, 'background' );
     f1.addColor(params, 'color');
-    
     f1.add(params, 'xoffset',0,windowWidth-300)
     f1.add(params, 'yoffset',0,windowHeight)
 
@@ -87,6 +76,7 @@ function setup(){
 
     anchorX =  windowWidth/4;
     anchorY = windowHeight/2;
+    getPoints();
 }
 
 
@@ -98,13 +88,10 @@ function draw(){
    if (drawing){
         push()
         translate(params.xoffset, params.yoffset)
- 
         strokeWeight(params.stroke_weight )
         stroke(params.color)
-
         for (var i = 0 ; i < tentacles.length ; i++){
             tentacles[i].draw();
-
         }
         pop()
     }
@@ -115,26 +102,22 @@ function mouseDragged(){
         anchorX = mouseX
         anchorY = mouseY
     }
-
 }
 
 
-
-function Tentacle(x,y,color){
+function Tentacle(x,y, noiseM, minRand, maxRand, dimStep){
     this.x =x ;
     this.y =y;
 
-    this.minRandom = 5;
-    this.maxRandom = 10;
+    this.minRandom = minRand;
+    this.maxRandom = maxRand;
 
-    this.dimStep = 0.07;
+    this.dimStep = dimStep;
     this.size = random(this.minRandom,this.maxRandom);
-    this.color = color;
     this.angle = random(360);
     this.radius = 0;
     this.noiseFactor = random(500);
-    this.noiseMultiplicator = 5;
-
+    this.noiseMultiplicator = noiseM;
 
     this.draw = function(){
 
@@ -148,7 +131,6 @@ function Tentacle(x,y,color){
         noStroke();
         var drawX = this.x + this.radius*cos(radians(this.angle));
         var drawY = this.y + this.radius*sin(radians(this.angle));
-
         ellipse(drawX, drawY, this.size, this.size);
 
         if (this.size < 0){
@@ -162,29 +144,28 @@ function Tentacle(x,y,color){
     this.setNoiseM = function(val){
         this.noiseMultiplicator = val;
     }
-
-
 }
+
 
 var Parameters = function(){
 
-    this.xoffset = 25
-    this.yoffset = windowHeight/2
-
+    this.font = "../fonts/AvenirNextLTW01-Medium.woff"
     this.message = 'p5*js';
     this.spacing = 20;
     this.size = 400;
 
-
-
     this.background = [0,0,0,0]; 
-
     this.color = [237,34,93,5];
+    this.xoffset = windowWidth/3 - this.size/2  
+    this.yoffset = windowHeight*2/3
+
+    this.tnoiseMultiplicator = 5;   
+    this.tminRandom = 5;
+    this.tmaxRandom = 10;
+    this.tdimStep = 0.07;
 
     this.regenerate = function(){
-        tentacles = [];
-        background(this.background); 
-
+        background(0); 
         getPoints();
     }
 
@@ -193,84 +174,79 @@ var Parameters = function(){
     }
     this.clear = function(){
         background(0); 
-
     }
 
     this.dispertion_effect = function(){
         background(0);
-        tentacles =[];
         this.background = [0,0,0]; 
         this.color = [237,34,93,255];
-        this.spacing = 0.75;
-        getPoints();
-
+        this.spacing = 0.75;  
+        this.tnoiseMultiplicator = 5;
+        this.tminRandom = 5;
+        this.tmaxRandom = 10;
+        this.tdimStep = 0.07;
+        getPoints();  
     }
 
      this.fireworks_effect = function(){
         background(0);
-        tentacles =[];
         this.background = [0,0,0,15]; 
         this.color = [237,34,93,45];
         this.spacing = 1.5;
+        this.tnoiseMultiplicator = 5;
+        this.tminRandom = 5;
+        this.tmaxRandom = 10;
+        this.tdimStep = 0.07;
         getPoints();
     }
 
 
     this.spiky_effect = function(){
         background(0);
-        tentacles =[];
         this.background = [0,0,0,0]; 
-        this.color = [237,34,93,20  ];
-        this.spacing = 5   ;
+        this.color = [237,34,93,20];
+        this.spacing = 5 ;
+        this.tnoiseMultiplicator = 5;
+        this.tminRandom = 5;
+        this.tmaxRandom = 10;
+        this.tdimStep = 0.07;
         getPoints();
-
     }
 
-     this.curly_effect = function(){
-        background(0);
-        drawing = false;
-        tentacles =[];
-        this.background = [0,0,0,5  ]; 
-        this.color = [237,34,93,60   ];
+    this.curly_effect = function(){
+        background(0); 
+        this.background = [0,0,0,0]; 
+        this.color = [237,34,93,30   ];
         this.spacing = 20   ;
-        getPoints();
-
-        for (var i = 0 ; i < tentacles.length ; i++){
-            tentacles[i].setNoiseM(45);
-        }
-
+        this.tnoiseMultiplicator = 45;
+        this.tminRandom = 5;
+        this.tmaxRandom = 10;
+        this.tdimStep = 0.07;
+        getPoints();   
     }
 
-     this.orbiting_effect = function(){
+    this.orbiting_effect = function(){
         background(0);
-        drawing = false;
-        tentacles =[];
         this.background = [0,0,0 ]; 
         this.color = [237,34,93];
-        this.spacing = 5   ;
+        this.spacing = 3   ;
+        this.tnoiseMultiplicator = 90;
+        this.tminRandom = 5;
+        this.tmaxRandom = 20;
+        this.tdimStep = 0.07;
         getPoints();
-
-        for (var i = 0 ; i < tentacles.length ; i++){
-            tentacles[i].setNoiseM(180);
-        }
-
     }
 
     this.bubbling_effect = function(){
         background(0);
-        drawing = false;
-        tentacles =[];
         this.background = [0,0,0 ]; 
         this.color = [237,34,93];
         this.spacing = 5   ;
+        this.tnoiseMultiplicator = 5;
+        this.tminRandom = 15;
+        this.tmaxRandom = 35;
+        this.tdimStep = 0.9;
         getPoints();
-
-        for (var i = 0 ; i < tentacles.length ; i++){
-            tentacles[i].maxRandom = 15;
-            tentacles[i].minRandom = 35;
-            tentacles[i].dimStep = 0.9;
-        }
-
     }
 
 }
