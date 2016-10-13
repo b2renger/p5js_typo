@@ -43,7 +43,7 @@ function setup(){
     gui.add(params, 'preset1')
     gui.add(params, 'preset2')
     gui.add(params, 'preset3')
-    gui.add(params, 'preset4')
+    gui.add(params, 'preset4')  
    
      // Configuration parameters
     // font selector
