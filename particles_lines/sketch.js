@@ -61,18 +61,18 @@ function setup(){
                             NovaMono : "../fonts/Nova_Mono/NovaMono.ttf", ShadowsIntoLight : "../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf", 
                             Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
                             UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
-    f2.add(params, 'message');
-    f2.add(params, 'spacing', 1, 40);
-    f2.add(params, 'size', 100, 1000);
+    f2.add(params, 'message').listen();
+    f2.add(params, 'spacing', 1, 40).listen();
+    f2.add(params, 'size', 100, 1000).listen();
     f2.add(params, 'regenerate');
 
-    f1.addColor(params, 'background');
-    f1.addColor(params, 'color');
-    f1.add(params, 'strokeWeight',0.1,2);
-    f1.add(params, 'threshold',10,150 );
-    f1.add(params, 'show_particles');
-    f1.add(params, 'xoffset',0,windowWidth-300)
-    f1.add(params, 'yoffset',0,windowHeight)
+    f1.addColor(params, 'background').listen();
+    f1.addColor(params, 'color').listen();
+    f1.add(params, 'strokeWeight',0.1,2).listen();
+    f1.add(params, 'threshold',10,150 ).listen();
+    f1.add(params, 'show_particles').listen();
+    f1.add(params, 'xoffset',0,windowWidth-300).listen();
+    f1.add(params, 'yoffset',0,windowHeight).listen();
 
     gui.add(params, 'preset0')
     gui.add(params, 'preset1')

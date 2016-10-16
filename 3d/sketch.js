@@ -58,20 +58,20 @@ function setup(){
                             NovaMono : "../fonts/Nova_Mono/NovaMono.ttf", ShadowsIntoLight : "../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf", 
                             Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
                             UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
-    f2.add(params, 'message');
-    f2.add(params, 'spacing', 1, 60);
-    f2.add(params, 'size', 100, 800);
+    f2.add(params, 'message').listen();
+    f2.add(params, 'spacing', 1, 60).listen();
+    f2.add(params, 'size', 100, 800).listen();
     f2.add(params, 'regenerate');
 
     // RT parameters
     // color selectors
-    f1.addColor(params, 'background' );
-    f1.add(params, 'shape_type', { Cone: 0, Ellipsoid: 1, Torus: 2, Cylinder:3, Sphere: 4, Box:5, Plane:6 } );
-    f1.add(params, 'shape_size',5,50)
-    f1.add(params, 'alignement_x',-1000,0)
-    f1.add(params, 'alignement_y',-250,500)
-    f1.add(params, 'animation',{agregate : 0 , explode : 1})
-    f1.add(params, 'animation_speed', 0.001, 0.15)
+    f1.addColor(params, 'background' ).listen();
+    f1.add(params, 'shape_type', { Cone: 0, Ellipsoid: 1, Torus: 2, Cylinder:3, Sphere: 4, Box:5, Plane:6 } ).listen();
+    f1.add(params, 'shape_size',5,50).listen();
+    f1.add(params, 'alignement_x',-1000,0).listen();
+    f1.add(params, 'alignement_y',-250,500).listen();
+    f1.add(params, 'animation',{agregate : 0 , explode : 1}).listen();
+    f1.add(params, 'animation_speed', 0.001, 0.15).listen();
     
     // Camera parameters
     f3.add(cc, 'x_rotation', -PI/2,PI/2);

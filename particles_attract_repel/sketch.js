@@ -55,19 +55,19 @@ function setup(){
                             Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
                             UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
     f2.add(params, 'message');
-    f2.add(params, 'spacing', 2, 40);
-    f2.add(params, 'size', 100, 1000);
+    f2.add(params, 'spacing', 2, 40).listen();
+    f2.add(params, 'size', 100, 1000).listen();
     f2.add(params, 'regenerate');
 
-    f1.addColor(params, 'background');
-    f1.addColor(params, 'color');
-    f1.add(params, 'particle_size',5,20);
-    f1.add(params, 'repulsion_threshold',10,500 );
-    f1.add(params, 'xoffset',0,windowWidth-300)
-    f1.add(params, 'yoffset',0,windowHeight)
+    f1.addColor(params, 'background').listen();
+    f1.addColor(params, 'color').listen();
+    f1.add(params, 'particle_size',5,20).listen();
+    f1.add(params, 'repulsion_threshold',10,500 ).listen();
+    f1.add(params, 'xoffset',0,windowWidth-300).listen();
+    f1.add(params, 'yoffset',0,windowHeight).listen();
 
-    gui.add(params, 'preset0')
-    gui.add(params, 'preset1')
+    gui.add(params, 'preset0').listen();
+    gui.add(params, 'preset1').listen();
 
     gui.add(params, 'clear')
     gui.add(params, 'save')

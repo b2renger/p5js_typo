@@ -53,23 +53,23 @@ function setup(){
                             Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
                             UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
     f2.add(params, 'message');
-    f2.add(params, 'spacing', 1, 100);
-    f2.add(params, 'size', 100, 1200);
+    f2.add(params, 'spacing', 1, 100).listen();
+    f2.add(params, 'size', 100, 1200).listen();
     f2.add(params, 'regenerate');
 
-    f1.addColor(params, 'background' );
-    f1.addColor(params, 'color');
-    f1.add(params, 'shape', {line : 0 , circle : 1 , rectangle :2})
-    f1.add(params, 'shape_size', 10 ,500)
-    f1.add(params, 'stroke_weight',0.5,20);
+    f1.addColor(params, 'background' ).listen();
+    f1.addColor(params, 'color').listen();
+    f1.add(params, 'shape', {line : 0 , circle : 1 , rectangle :2}).listen();
+    f1.add(params, 'shape_size', 10 ,500).listen();
+    f1.add(params, 'stroke_weight',0.5,20).listen();
 
-    f1.add(params, 'bowing',1,360);
-    f1.add(params, 'roughness',1,25);
-    f1.add(params, 'maxOffset',1,100);
+    f1.add(params, 'bowing',1,360).listen();
+    f1.add(params, 'roughness',1,25).listen();
+    f1.add(params, 'maxOffset',1,100).listen();
     
-    f1.add(params, 'xoffset',0,windowWidth-300)
-    f1.add(params, 'yoffset',0,windowHeight)
-    f1.add(params, 'autoregenerate')
+    f1.add(params, 'xoffset',0,windowWidth-300).listen();
+    f1.add(params, 'yoffset',0,windowHeight).listen();
+    f1.add(params, 'autoregenerate').listen();
 
 
     gui.add(params, 'clear')
