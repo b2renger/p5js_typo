@@ -1,5 +1,3 @@
-gifs 
-
 
 # p5js_typo
 
@@ -83,7 +81,7 @@ the base of code used in the examples is a bit complex, our goal is :
 1- to load a font, and analyse it using Rune.font to get a list of polygons we can use
 2- setup some gui elements to change the font and few parameters aswell as a button to regenerate the path.
 
-Here is the code
+Here is the code :
 
 ```javascript
 var f;
@@ -135,9 +133,66 @@ function getPoints(){
         drawing = true;
     });
 }
+
+var Parameters = function(){
+
+    this.font = "../fonts/AvenirNextLTW01-Medium.woff"
+    this.message = 'p5*js';
+    this.spacing = 2;
+    this.size = 400;
+
+    this.regenerate = function(){
+        getPoints();
+    }
+
+    this.save = function(){
+        saveCanvas()
+    }
+
+}
 ```
 
 Quite a few things happened here, so let's break it down.
+
+First we create a few variables that will be handy.
+
+```javascript
+var f; // store the current font
+var path; // store the path calculated from the current font
+var polys; // store the array of polygons calculated from the current font
+var drawing = false; // as loading is asynchron we need to keep track of its progression
+var gui, params; // store gui related things.
+```
+The boolean **drawing** is used to know when the loading of the font is finished : when the font is loaded we have a path varaible that is not null aswell as an array of polygons. This variable is used in the **getPoints()**, it is set to *false* at the beginning, and set to *true* when the font is finally loaded.
+
+So let's now have a look at the **getPoints()** function
+
+```javascript
+// this function loads a font, and create an array of polygons
+// a polygon being itself an array of vectors with x/y coordinates
+function getPoints(){
+    drawing = false;
+    // create new font : we use rune
+    console.log(params.font);
+    f = new Rune.Font(params.font) 
+    // load the font
+    f.load(function(err){       
+        path = f.toPath(params.message, 0, 0, params.size)
+        polys = path.toPolygons({ spacing:params.spacing })
+        drawing = true;
+    });
+}
+```
+it's pretty straight forward, and it runs with minimal changes from the Rune.font documentation example :
+
+http://printingcode.runemadsen.com/examples/typography/font/
+
+we have a callback for when the loading is actually finished, and when it's done we can actually draw. However you'll notice that I use things like *params.font*, *params.spacing* instead of the "hardcoded values from the Rune documentation.
+
+This is because of the dat.GUI implementation for parameters.
+
+
+
 
 
 
