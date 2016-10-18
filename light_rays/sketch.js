@@ -6,31 +6,20 @@ var drawing = false;
 var gui, params;
 var anchorX, anchorY;
 
-function preload(){
-    // create new font
-    f = new Rune.Font("../AvenirNextLTW01-Medium.woff")
 
-    // function with callback to calculate paths etc.
-    f.load(function(err){     
-        path = f.toPath("p5*js", 0, 0, 400)
-        polys = path.toPolygons({ spacing:2 })
-        ready() 
-    })
-
-}
-
-// when updating text or some of its parameters, this function is called on regenerate
+// this function loads a font, and create an array of polygons
+// a polygon being itself an array of vectors with x/y coordinates
 function getPoints(){
-     f.load(function(err){     
+    drawing = false;
+    // create new font : we use rune
+    console.log(params.font);
+    f = new Rune.Font(params.font) 
+    // load the font
+    f.load(function(err){       
         path = f.toPath(params.message, 0, 0, params.size)
         polys = path.toPolygons({ spacing:params.spacing })
-        ready()
-    })
-}
-
-// update drawing boolean to tell that we are ready paths have loaded
-function ready(){
-    drawing = true;
+        drawing = true;
+    });
 }
 
 
@@ -43,24 +32,35 @@ function setup(){
     // create dat.gui drawer
     gui = new dat.GUI();
     // gui setup
+    var f2 = gui.addFolder('configuration / path generation')
     var f1 = gui.addFolder('real-time parameters');
-    var f2 = gui.addFolder('parameters that need regeneration of the path');
 
+     // Configuration parameters
+    // font selector
+    f2.add(params, 'font', {Avenir : "../fonts/AvenirNextLTW01-Medium.woff", BlackOpsOne : "../fonts/Black_Ops_One/BlackOpsOne-Regular.ttf",
+                            Comfortaa : "../fonts/Comfortaa/Comfortaa-Bold.ttf",
+                            NovaMono : "../fonts/Nova_Mono/NovaMono.ttf", ShadowsIntoLight : "../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf", 
+                            Sniglet: "../fonts/Sniglet/Sniglet-ExtraBold.ttf",Tangerine : "../fonts/Tangerine/Tangerine_Bold.ttf",
+                            UnicaOne : "../fonts/Unica_One/UnicaOne-Regular.ttf"});  
     f2.add(params, 'message');
-    f2.add(params, 'spacing', 1, 25);
-    f2.add(params, 'size', 100, 400);
+    f2.add(params, 'spacing', 1, 25).listen();
+    f2.add(params, 'size', 100, 1200).listen();
     f2.add(params, 'regenerate');
 
-    f1.addColor(params, 'background', { Black: 0, White: 255 } );
-    f1.addColor(params, 'color');
-    f1.add(params, 'stroke_weight', 0.1, 15);
-    f1.add(params, 'xoffset',0,windowWidth-300)
-    f1.add(params, 'yoffset',0,windowHeight)
+    // Drawing parameters
+    f1.addColor(params, 'background').listen();
+    f1.addColor(params, 'color').listen();
+    f1.add(params, 'stroke_weight', 0.1, 15).listen();
+    f1.add(params, 'xoffset',0,windowWidth-300).listen();
+    f1.add(params, 'yoffset',0,windowHeight).listen();
 
+    // button
     gui.add(params, 'save')
 
     anchorX =  windowWidth/4;
     anchorY = windowHeight/2;
+
+    getPoints();
 }
 
 
@@ -71,14 +71,11 @@ function draw(){
     if (drawing){
         push()
         translate(params.xoffset, params.yoffset)
- 
         strokeWeight(params.stroke_weight )
         stroke(params.color)
 
-
         for (var i=0; i < polys.length ; i++){
            var poly = polys[i];
-
             for(var j = 0; j < poly.state.vectors.length; j++) {
                 var vec = poly.state.vectors[j];
                 line(anchorX-params.xoffset , anchorY-params.yoffset, vec.x, vec.y);
@@ -100,20 +97,18 @@ function mouseDragged(){
 
 var Parameters = function(){
 
-    this.xoffset = 25
-    this.yoffset = windowHeight/2
-
+    this.font = "../fonts/AvenirNextLTW01-Medium.woff"
     this.message = 'p5*js';
     this.spacing = 2;
     this.size = 400;
-
-    
+ 
     this.stroke_weight = 1;
-    this.opacity = 55;
 
     this.background = [0,0,0]; 
-
     this.color = [237,34,93,55];
+
+    this.xoffset = 25
+    this.yoffset = windowHeight/2
 
     this.regenerate = function(){
         getPoints();
