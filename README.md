@@ -205,9 +205,13 @@ it's pretty straight forward, and it runs with minimal changes from the Rune.fon
 
 http://printingcode.runemadsen.com/examples/typography/font/
 
-we have a callback for when the loading is actually finished. When it's done we can actually draw. However you'll notice that I use things like *params.font*, *params.spacing* instead of the "hardcoded values from the Rune documentation.
+we have a callback for when the loading is actually finished. When it's done we can actually draw. However you'll notice that I use things like *params.font*, *params.spacing* instead of the "hardcoded values from the Rune documentation. This is because of the dat.GUI implementation for parameters. 
 
-This is because of the dat.GUI implementation for parameters. Our boilerplate code involves being able to switch fonts, change the size of the message we want to display, and the spacing of points on the outline of the fonts. Those parameters can be changed via a gui, and once you are set you can click on *regenerate* to recalculate the **path** and the **polys** variable.
+#### Gui creation
+
+The main ressource to learn dat.GUI is located here for further references : http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage
+
+Our boilerplate code involves being able to switch fonts, change the size of the message we want to display, and the spacing of points on the outline of the fonts. Those parameters can be changed via a gui, and once you are set you can click on *regenerate* to recalculate the **path** and the **polys** variable.
 
 To do that dat.GUI is pretty easy. The variable named **gui** represents the things that will be displayed in the control drawer, whereas the variable named **params** is a javascript object that will simply hold our parameter values.
 
@@ -228,7 +232,7 @@ var Parameters = function(){
     this.spacing = 2;
     this.size = 400;
 
-    this.regenerate = function(){
+        this.regenerate = function(){
         getPoints();
     }
 
@@ -271,8 +275,25 @@ You can also notice the **.listen()** which will make the gui elements listen to
 
 ### Drawing code
 
+We now have the basics for our code base. All we have to do now is actually draw.
 
+In most of the example, some "drawing" things are already happening in the **getPoints()** function because we want to create a collection of objects (in the sense of oop objects) that take the coordinates of each point of each polygon. In that case the drawing is merely about creating a **for** loop that runs through our collection and calls the appropriate behavior.
 
+But we can also simply iterate through our array of polygons to draw a shape on each spot... something like :
+
+```javascript
+for (var i=0; i < polys.length ; i++){
+           var poly = polys[i];
+           for(var j = 0; j < poly.state.vectors.length; j++) {
+                var vec1 = poly.state.vectors[j];
+          
+                noFill()
+                stroke(255);
+                strokeWeight(1);
+                scribble.scribbleEllipse(vec1.x, vec1.y,25,25);   
+           }
+}                
+```
 
 ## Examples details 
 
