@@ -1,39 +1,20 @@
 
 # p5js_typo
 
+![Gif](assets/p5js_typo.gif)
+
 A repo to experiment (have fun) with typography using p5*js and Rune.font
 
 
 ## Interactive demos :
 
-light rays : https://b2renger.github.io/p5js_typo/light_rays/index.html
-
-![light ray image](assets/Light_rays.png)
-
-spot lights : https://b2renger.github.io/p5js_typo/spot_lights/index.html
-
-![spot light image](assets/spot_lights.png)
-
-3d : https://b2renger.github.io/p5js_typo/3d/index.html
-
-![3d image](assets/3d.png)
-
-particles lines : https://b2renger.github.io/p5js_typo/particles_lines/index.html
-
-![particle lines image](assets/particle_lines.png)
-
-particles attract / repel : https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html
-
-![particle image](assets/particles.png)
-
-scribble : https://b2renger.github.io/p5js_typo/scribble/index.html
-
-![scribble image](assets/scribble.png)
-
-tentacles : https://b2renger.github.io/p5js_typo/tentacles/index.html
-
-![tentacles image](assets/tentacles.png)
-
+* light rays : https://b2renger.github.io/p5js_typo/light_rays/index.html
+* spot lights : https://b2renger.github.io/p5js_typo/spot_lights/index.html
+* 3d : https://b2renger.github.io/p5js_typo/3d/index.html
+* particles lines : https://b2renger.github.io/p5js_typo/particles_lines/index.html
+* particles attract / repel : https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html
+* scribble : https://b2renger.github.io/p5js_typo/scribble/index.html
+* tentacles : https://b2renger.github.io/p5js_typo/tentacles/index.html
 
 ## Tools
 
@@ -312,15 +293,33 @@ for (var i=0; i < polys.length ; i++){
 ## Examples details 
 
 ### 3d
+![3d image](assets/3d.png)
 
 ### light rays
+![light ray image](assets/Light_rays.png)
 
 ### spot lights
+![spot light image](assets/spot_lights.png)
 
 ### particle lines
+![particle lines image](assets/particle_lines.png)
 
 ### particles attract repel
+![particle image](assets/particles.png)
 
 ### scribble 
+![scribble image](assets/scribble.png)
 
 ### tentacles
+![tentacles image](assets/tentacles.png)
+
+
+
+
+
+
+
+
+
+
+
