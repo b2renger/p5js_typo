@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-dark.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
+
+    <title>P5js typo by b2renger</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>P5js typo</h1>
+        <h2>A repo to experiment with typography using p5*js and Rune.font</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/b2renger/p5js_typo/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/b2renger/p5js_typo/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/b2renger/p5js_typo" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <h1>
+<a id="p5js_typo" class="anchor" href="#p5js_typo" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>p5js_typo</h1>
+
+<p><img src="assets/p5js_typo.gif" alt="Gif"></p>
+
+<p>A repo to experiment (have fun) with typography using p5*js and Rune.font</p>
+
+<h2>
+<a id="interactive-demos-" class="anchor" href="#interactive-demos-" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Interactive demos :</h2>
+
+<ul>
+<li>light rays : <a href="https://b2renger.github.io/p5js_typo/light_rays/index.html">https://b2renger.github.io/p5js_typo/light_rays/index.html</a>
+</li>
+<li>spot lights : <a href="https://b2renger.github.io/p5js_typo/spot_lights/index.html">https://b2renger.github.io/p5js_typo/spot_lights/index.html</a>
+</li>
+<li>3d : <a href="https://b2renger.github.io/p5js_typo/3d/index.html">https://b2renger.github.io/p5js_typo/3d/index.html</a>
+</li>
+<li>particles lines : <a href="https://b2renger.github.io/p5js_typo/particles_lines/index.html">https://b2renger.github.io/p5js_typo/particles_lines/index.html</a>
+</li>
+<li>particles attract / repel : <a href="https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html">https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html</a>
+</li>
+<li>scribble : <a href="https://b2renger.github.io/p5js_typo/scribble/index.html">https://b2renger.github.io/p5js_typo/scribble/index.html</a>
+</li>
+<li>tentacles : <a href="https://b2renger.github.io/p5js_typo/tentacles/index.html">https://b2renger.github.io/p5js_typo/tentacles/index.html</a>
+</li>
+</ul>
+
+<h2>
+<a id="tools" class="anchor" href="#tools" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Tools</h2>
+
+<h3>
+<a id="drawing-framework" class="anchor" href="#drawing-framework" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Drawing Framework</h3>
+
+<p><strong>p5xjs</strong> </p>
+
+<p><a href="http://p5js.org/">http://p5js.org/</a></p>
+
+<p>this is our drawing library, it's used to setup the page, the canvas, programm the behaviors of animated objects etc. The website is full of ressources and tutorial to learn, you can also check Daniel Shiffman youtube channel.</p>
+
+<p><strong>scribble</strong></p>
+
+<p><a href="https://github.com/generative-light/p5.scribble.js">https://github.com/generative-light/p5.scribble.js</a></p>
+
+<p>this is a library for p5xjs and is only used in one experiment. It's made to make your lines and other shapes look as if the were drawn by hand.</p>
+
+<h3>
+<a id="typographic-library" class="anchor" href="#typographic-library" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Typographic library</h3>
+
+<p><strong>Rune</strong> </p>
+
+<p><a href="https://github.com/runemadsen/rune.js">https://github.com/runemadsen/rune.js</a> </p>
+
+<p>Rune is a full framework for graphic design. It is not limited to typography but we are using it mainly because of Rune.font addon and its support of paths.</p>
+
+<p><strong>Rune.font</strong> </p>
+
+<p><a href="https://github.com/runemadsen/rune.font.js">https://github.com/runemadsen/rune.font.js</a></p>
+
+<p>Rune.font is plugin for Rune, it allows us to load a font and convert its outline to Rune.path objects or a series of polygons that we will be able to use withing p5xjs.</p>
+
+<p><em>Rune Madsen</em>, author of the Rune framework, has a great lecture about typography btw : <a href="http://printingcode.runemadsen.com/lecture-typography/">http://printingcode.runemadsen.com/lecture-typography/</a></p>
+
+<h3>
+<a id="gui-library" class="anchor" href="#gui-library" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gui library</h3>
+
+<p><strong>dat.GUI</strong> </p>
+
+<p><a href="https://github.com/dataarts/dat.gui">https://github.com/dataarts/dat.gui</a></p>
+
+<p>dat.GUI is lightweight user interface library for js. It provides a collapsing drawer in which you can place sliders, buttons etc.</p>
+
+<h2>
+<a id="hands-on-tutorial" class="anchor" href="#hands-on-tutorial" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Hands on tutorial</h2>
+
+<p>I will not explain in details how p5xjs works, there is plenty of ressources on the web about that. Hrere I will try to explain how to interface all our tools together.</p>
+
+<p>First p5xjs uses two main functions</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">function</span> <span class="pl-en">setup</span>(){
+
+}</pre></div>
+
+<p>and</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">function</span> <span class="pl-en">draw</span>(){
+
+}</pre></div>
+
+<p>the <em>setup</em> is used to initialize all our variables, create a canvas etc. it is called once : on the loading of our page.
+the <em>draw</em> is an infinite loop that runs until the page is closed.</p>
+
+<p>A lot of the "boilerplate" code will happen in the former, whereas the actual drawing and interaction will happen in the later.</p>
+
+<h3>
+<a id="boilerplate-code" class="anchor" href="#boilerplate-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Boilerplate code</h3>
+
+<p>the base of code used in the examples is a bit complex, our goal is :</p>
+
+<p>1- to load a font, and analyse it using Rune.font to get a list of polygons we can use.</p>
+
+<p>2- setup some gui elements to change the font and few parameters aswell as a button to regenerate the path.</p>
+
+<p>Here is the code :</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> f;
+<span class="pl-k">var</span> path;
+<span class="pl-k">var</span> polys;
+<span class="pl-k">var</span> drawing <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+<span class="pl-k">var</span> gui, params;
+
+<span class="pl-k">function</span> <span class="pl-en">setup</span>(){
+    <span class="pl-en">createCanvas</span>(windowWidth,windowHeight)  <span class="pl-c">// create a full screen canvas</span>
+    <span class="pl-en">background</span>(<span class="pl-c1">255</span>)
+
+    <span class="pl-c">// init all parameters</span>
+    params <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Parameters</span>();
+    <span class="pl-c">// create dat.gui drawer</span>
+    gui <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">dat.GUI</span>();
+    <span class="pl-c">// gui setup</span>
+    <span class="pl-k">var</span> f2 <span class="pl-k">=</span> <span class="pl-smi">gui</span>.<span class="pl-en">addFolder</span>(<span class="pl-s"><span class="pl-pds">'</span>configuration / path generation<span class="pl-pds">'</span></span>)
+
+     <span class="pl-c">// Configuration parameters</span>
+    <span class="pl-c">// font selector</span>
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, {Avenir <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/AvenirNextLTW01-Medium.woff<span class="pl-pds">"</span></span>, BlackOpsOne <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Black_Ops_One/BlackOpsOne-Regular.ttf<span class="pl-pds">"</span></span>,
+                            Comfortaa <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Comfortaa/Comfortaa-Bold.ttf<span class="pl-pds">"</span></span>,
+                            NovaMono <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Nova_Mono/NovaMono.ttf<span class="pl-pds">"</span></span>, ShadowsIntoLight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf<span class="pl-pds">"</span></span>, 
+                            Sniglet<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Sniglet/Sniglet-ExtraBold.ttf<span class="pl-pds">"</span></span>,Tangerine <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Tangerine/Tangerine_Bold.ttf<span class="pl-pds">"</span></span>,
+                            UnicaOne <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Unica_One/UnicaOne-Regular.ttf<span class="pl-pds">"</span></span>});  
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>message<span class="pl-pds">'</span></span>);
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>spacing<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">25</span>).<span class="pl-en">listen</span>();
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>size<span class="pl-pds">'</span></span>, <span class="pl-c1">100</span>, <span class="pl-c1">1200</span>).<span class="pl-en">listen</span>();
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>regenerate<span class="pl-pds">'</span></span>);
+
+    <span class="pl-c">// button</span>
+    <span class="pl-smi">gui</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>save<span class="pl-pds">'</span></span>)
+
+    <span class="pl-en">getPoints</span>();
+}
+
+<span class="pl-c">// this function loads a font, and create an array of polygons</span>
+<span class="pl-c">// a polygon being itself an array of vectors with x/y coordinates</span>
+<span class="pl-k">function</span> <span class="pl-en">getPoints</span>(){
+    drawing <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+    <span class="pl-c">// create new font : we use rune</span>
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-smi">params</span>.<span class="pl-smi">font</span>);
+    f <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Rune.Font</span>(<span class="pl-smi">params</span>.<span class="pl-smi">font</span>) 
+    <span class="pl-c">// load the font</span>
+    <span class="pl-smi">f</span>.<span class="pl-c1">load</span>(<span class="pl-k">function</span>(<span class="pl-smi">err</span>){       
+        path <span class="pl-k">=</span> <span class="pl-smi">f</span>.<span class="pl-en">toPath</span>(<span class="pl-smi">params</span>.<span class="pl-smi">message</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-smi">params</span>.<span class="pl-c1">size</span>)
+        polys <span class="pl-k">=</span> <span class="pl-smi">path</span>.<span class="pl-en">toPolygons</span>({ spacing<span class="pl-k">:</span><span class="pl-smi">params</span>.<span class="pl-smi">spacing</span> })
+        drawing <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    });
+}
+
+<span class="pl-k">var</span> <span class="pl-en">Parameters</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+
+    <span class="pl-v">this</span>.<span class="pl-smi">font</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/AvenirNextLTW01-Medium.woff<span class="pl-pds">"</span></span>
+    <span class="pl-v">this</span>.<span class="pl-smi">message</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>p5*js<span class="pl-pds">'</span></span>;
+    <span class="pl-v">this</span>.<span class="pl-smi">spacing</span> <span class="pl-k">=</span> <span class="pl-c1">2</span>;
+    <span class="pl-v">this</span>.<span class="pl-c1">size</span> <span class="pl-k">=</span> <span class="pl-c1">400</span>;
+
+    <span class="pl-v">this</span>.<span class="pl-en">regenerate</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+        <span class="pl-en">getPoints</span>();
+    }
+
+    <span class="pl-v">this</span>.<span class="pl-en">save</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+        <span class="pl-en">saveCanvas</span>()
+    }
+
+}</pre></div>
+
+<p>Quite a few things happened here, so let's break it down.</p>
+
+<h4>
+<a id="loading-a-font-and-generating-a-path" class="anchor" href="#loading-a-font-and-generating-a-path" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Loading a font and generating a path</h4>
+
+<p>First we create a few variables that will be handy.</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> f; <span class="pl-c">// store the current font</span>
+<span class="pl-k">var</span> path; <span class="pl-c">// store the path calculated from the current font</span>
+<span class="pl-k">var</span> polys; <span class="pl-c">// store the array of polygons calculated from the current font</span>
+<span class="pl-k">var</span> drawing <span class="pl-k">=</span> <span class="pl-c1">false</span>; <span class="pl-c">// as loading is asynchron we need to keep track of its progression</span>
+<span class="pl-k">var</span> gui, params; <span class="pl-c">// store gui related things.</span></pre></div>
+
+<p>The boolean <strong>drawing</strong> is used to know when the loading of the font is finished : when the font is loaded we have a path varaible that is not null aswell as an array of polygons. This variable is used in the <strong>getPoints()</strong>, it is set to <em>false</em> at the beginning, and set to <em>true</em> when the font is finally loaded.</p>
+
+<p>So let's now have a look at the <strong>getPoints()</strong> function</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-c">// this function loads a font, and create an array of polygons</span>
+<span class="pl-c">// a polygon being itself an array of vectors with x/y coordinates</span>
+<span class="pl-k">function</span> <span class="pl-en">getPoints</span>(){
+    drawing <span class="pl-k">=</span> <span class="pl-c1">false</span>;
+    <span class="pl-c">// create new font : we use rune</span>
+    <span class="pl-en">console</span>.<span class="pl-c1">log</span>(<span class="pl-smi">params</span>.<span class="pl-smi">font</span>);
+    f <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Rune.Font</span>(<span class="pl-smi">params</span>.<span class="pl-smi">font</span>) 
+    <span class="pl-c">// load the font</span>
+    <span class="pl-smi">f</span>.<span class="pl-c1">load</span>(<span class="pl-k">function</span>(<span class="pl-smi">err</span>){       
+        path <span class="pl-k">=</span> <span class="pl-smi">f</span>.<span class="pl-en">toPath</span>(<span class="pl-smi">params</span>.<span class="pl-smi">message</span>, <span class="pl-c1">0</span>, <span class="pl-c1">0</span>, <span class="pl-smi">params</span>.<span class="pl-c1">size</span>)
+        polys <span class="pl-k">=</span> <span class="pl-smi">path</span>.<span class="pl-en">toPolygons</span>({ spacing<span class="pl-k">:</span><span class="pl-smi">params</span>.<span class="pl-smi">spacing</span> })
+        drawing <span class="pl-k">=</span> <span class="pl-c1">true</span>;
+    });
+}</pre></div>
+
+<p>it's pretty straight forward, and it runs with minimal changes from the Rune.font documentation example :</p>
+
+<p><a href="http://printingcode.runemadsen.com/examples/typography/font/">http://printingcode.runemadsen.com/examples/typography/font/</a></p>
+
+<p>we have a callback for when the loading is actually finished. When it's done we can actually draw. However you'll notice that I use things like <em>params.font</em>, <em>params.spacing</em> instead of the "hardcoded values from the Rune documentation. This is because of the dat.GUI implementation for parameters. </p>
+
+<h4>
+<a id="gui-creation" class="anchor" href="#gui-creation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gui creation</h4>
+
+<p>The main ressource to learn dat.GUI is located here for further references : <a href="http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage">http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage</a></p>
+
+<p>Our boilerplate code involves being able to switch fonts, change the size of the message we want to display, and the spacing of points on the outline of the fonts. Those parameters can be changed via a gui, and once you are set you can click on <em>regenerate</em> to recalculate the <strong>path</strong> and the <strong>polys</strong> variable.</p>
+
+<p>To do that dat.GUI is pretty easy. The variable named <strong>gui</strong> represents the things that will be displayed in the control drawer, whereas the variable named <strong>params</strong> is a javascript object that will simply hold our parameter values.</p>
+
+<p>First let's concentrate on params, on the setup we just have this line to initialize our object.</p>
+
+<div class="highlight highlight-source-js"><pre>    <span class="pl-c">// init all parameters</span>
+    params <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">Parameters</span>();</pre></div>
+
+<p>and further on the code we have the actual object with its default parameters, which is just a data structure :</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> <span class="pl-en">Parameters</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+
+    <span class="pl-v">this</span>.<span class="pl-smi">font</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/AvenirNextLTW01-Medium.woff<span class="pl-pds">"</span></span>
+    <span class="pl-v">this</span>.<span class="pl-smi">message</span> <span class="pl-k">=</span> <span class="pl-s"><span class="pl-pds">'</span>p5*js<span class="pl-pds">'</span></span>;
+    <span class="pl-v">this</span>.<span class="pl-smi">spacing</span> <span class="pl-k">=</span> <span class="pl-c1">2</span>;
+    <span class="pl-v">this</span>.<span class="pl-c1">size</span> <span class="pl-k">=</span> <span class="pl-c1">400</span>;
+
+        <span class="pl-v">this</span>.<span class="pl-en">regenerate</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+        <span class="pl-en">getPoints</span>();
+    }
+
+    <span class="pl-v">this</span>.<span class="pl-en">save</span> <span class="pl-k">=</span> <span class="pl-k">function</span>(){
+        <span class="pl-en">saveCanvas</span>()
+    }
+
+}</pre></div>
+
+<p>dat.GUI will infer the kind of object it draws from the values of the varaibles. So the message by default is "p5xjs" but you can change it you will however need to click on the button <em>regenerate</em> to call the <strong>getPoints()</strong> function again to re-generate the path and our array of polygons. Since <strong>this.regenerate</strong> is a function it will be displayed as a button and once you click it you execute the code in-beetween the brackets.</p>
+
+<p>The filling of our control drawer is done in the <strong>setup()</strong> function :</p>
+
+<div class="highlight highlight-source-js"><pre>    <span class="pl-c">// create dat.gui drawer</span>
+    gui <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">dat.GUI</span>();
+
+    <span class="pl-c">// gui setup</span>
+    <span class="pl-k">var</span> f2 <span class="pl-k">=</span> <span class="pl-smi">gui</span>.<span class="pl-en">addFolder</span>(<span class="pl-s"><span class="pl-pds">'</span>configuration / path generation<span class="pl-pds">'</span></span>)</pre></div>
+
+<p>with the second line of code, we create a specific group of controls <strong>f2</strong> in our gui, which will be called 'configuration / path generation'. We will now add elements to this specific folder of controls.</p>
+
+<p>First a font selection object :</p>
+
+<div class="highlight highlight-source-js"><pre>    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>font<span class="pl-pds">'</span></span>, {Avenir <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/AvenirNextLTW01-Medium.woff<span class="pl-pds">"</span></span>, BlackOpsOne <span class="pl-k">:</span>     <span class="pl-s"><span class="pl-pds">"</span>../fonts/Black_Ops_One/BlackOpsOne-Regular.ttf<span class="pl-pds">"</span></span>, Comfortaa <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Comfortaa/Comfortaa-Bold.ttf<span class="pl-pds">"</span></span>,
+NovaMono <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Nova_Mono/NovaMono.ttf<span class="pl-pds">"</span></span>, ShadowsIntoLight <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Shadows_Into_Light/ShadowsIntoLight.ttf<span class="pl-pds">"</span></span>, 
+Sniglet<span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Sniglet/Sniglet-ExtraBold.ttf<span class="pl-pds">"</span></span>,Tangerine <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Tangerine/Tangerine_Bold.ttf<span class="pl-pds">"</span></span>, UnicaOne <span class="pl-k">:</span> <span class="pl-s"><span class="pl-pds">"</span>../fonts/Unica_One/UnicaOne-Regular.ttf<span class="pl-pds">"</span></span>});  </pre></div>
+
+<p>when you pass a json-like object to the <strong>.add()</strong> function it will create a dropdown list with each <em>key</em> appearing as an element of the list.</p>
+
+<p>we arleady mentionned <em>message</em> and <em>regenerate</em> entries, so we are left with the later two :</p>
+
+<div class="highlight highlight-source-js"><pre>    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>spacing<span class="pl-pds">'</span></span>, <span class="pl-c1">1</span>, <span class="pl-c1">25</span>).<span class="pl-en">listen</span>();
+    <span class="pl-smi">f2</span>.<span class="pl-c1">add</span>(params, <span class="pl-s"><span class="pl-pds">'</span>size<span class="pl-pds">'</span></span>, <span class="pl-c1">100</span>, <span class="pl-c1">1200</span>).<span class="pl-en">listen</span>();</pre></div>
+
+<p>those will be sliders as <strong>params.spacing</strong> and <strong>params.size</strong> are numeric value, you can then pass the lower and higher bounds as arguments. </p>
+
+<p>You can also notice the <strong>.listen()</strong> which will make the gui elements listen to the changes that would come from the programm. It can be usefull when creating presets - for instance in the "tentacles" example.</p>
+
+<h3>
+<a id="drawing-code" class="anchor" href="#drawing-code" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Drawing code</h3>
+
+<p>We now have the basics for our code base. All we have to do now is actually draw.</p>
+
+<p>In most of the example, some "drawing" things are already happening in the <strong>getPoints()</strong> function because we want to create a collection of objects (in the sense of oop objects) that take the coordinates of each point of each polygon. In that case the drawing is merely about creating a <strong>for</strong> loop that runs through our collection and calls the appropriate behavior.</p>
+
+<p>But we can also simply iterate through our array of polygons to draw a shape on each spot... something like :</p>
+
+<div class="highlight highlight-source-js"><pre><span class="pl-k">for</span> (<span class="pl-k">var</span> i<span class="pl-k">=</span><span class="pl-c1">0</span>; i <span class="pl-k">&lt;</span> <span class="pl-smi">polys</span>.<span class="pl-c1">length</span> ; i<span class="pl-k">++</span>){
+           <span class="pl-k">var</span> poly <span class="pl-k">=</span> polys[i];
+           <span class="pl-k">for</span>(<span class="pl-k">var</span> j <span class="pl-k">=</span> <span class="pl-c1">0</span>; j <span class="pl-k">&lt;</span> <span class="pl-smi">poly</span>.<span class="pl-smi">state</span>.<span class="pl-smi">vectors</span>.<span class="pl-c1">length</span>; j<span class="pl-k">++</span>) {
+                <span class="pl-k">var</span> vec1 <span class="pl-k">=</span> <span class="pl-smi">poly</span>.<span class="pl-smi">state</span>.<span class="pl-smi">vectors</span>[j];
+
+                <span class="pl-en">noFill</span>()
+                <span class="pl-en">stroke</span>(<span class="pl-c1">255</span>);
+                <span class="pl-en">strokeWeight</span>(<span class="pl-c1">1</span>);
+                <span class="pl-smi">scribble</span>.<span class="pl-en">scribbleEllipse</span>(<span class="pl-smi">vec1</span>.<span class="pl-c1">x</span>, <span class="pl-smi">vec1</span>.<span class="pl-c1">y</span>,<span class="pl-c1">25</span>,<span class="pl-c1">25</span>);   
+           }
+}                </pre></div>
+
+<h2>
+<a id="examples-details" class="anchor" href="#examples-details" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Examples details</h2>
+
+<h3>
+<a id="3d" class="anchor" href="#3d" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>3d</h3>
+
+<p><img src="assets/3d.png" alt="3d image"></p>
+
+<h3>
+<a id="light-rays" class="anchor" href="#light-rays" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>light rays</h3>
+
+<p><img src="assets/Light_rays.png" alt="light ray image"></p>
+
+<h3>
+<a id="spot-lights" class="anchor" href="#spot-lights" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>spot lights</h3>
+
+<p><img src="assets/spot_lights.png" alt="spot light image"></p>
+
+<h3>
+<a id="particle-lines" class="anchor" href="#particle-lines" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>particle lines</h3>
+
+<p><img src="assets/particle_lines.png" alt="particle lines image"></p>
+
+<h3>
+<a id="particles-attract-repel" class="anchor" href="#particles-attract-repel" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>particles attract repel</h3>
+
+<p><img src="assets/particles.png" alt="particle image"></p>
+
+<h3>
+<a id="scribble" class="anchor" href="#scribble" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>scribble</h3>
+
+<p><img src="assets/scribble.png" alt="scribble image"></p>
+
+<h3>
+<a id="tentacles" class="anchor" href="#tentacles" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>tentacles</h3>
+
+<p><img src="assets/tentacles.png" alt="tentacles image"></p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
