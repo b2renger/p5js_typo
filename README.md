@@ -8,13 +8,13 @@ A repo to experiment (have fun) with typography using p5*js and Rune.font
 
 ## Interactive demos :
 
-*light rays : https://b2renger.github.io/p5js_typo/light_rays/index.html
-*spot lights : https://b2renger.github.io/p5js_typo/spot_lights/index.html
-*3d : https://b2renger.github.io/p5js_typo/3d/index.html
-*particles lines : https://b2renger.github.io/p5js_typo/particles_lines/index.html
-*particles attract / repel : https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html
-*scribble : https://b2renger.github.io/p5js_typo/scribble/index.html
-*tentacles : https://b2renger.github.io/p5js_typo/tentacles/index.html
+* light rays : https://b2renger.github.io/p5js_typo/light_rays/index.html
+* spot lights : https://b2renger.github.io/p5js_typo/spot_lights/index.html
+* 3d : https://b2renger.github.io/p5js_typo/3d/index.html
+* particles lines : https://b2renger.github.io/p5js_typo/particles_lines/index.html
+* particles attract / repel : https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html
+* scribble : https://b2renger.github.io/p5js_typo/scribble/index.html
+* tentacles : https://b2renger.github.io/p5js_typo/tentacles/index.html
 
 ## Tools
 
