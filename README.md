@@ -3,24 +3,52 @@
 
 ![Gif](assets/p5js_typo.gif)
 
-A repo to experiment (have fun) with typography using p5*js and Rune.font
+A repo to experiment (have fun) with typography using p5*js and Rune.font. All the code can be viewed and download on this [github](https://github.com/b2renger/p5js_typo) repo.
 
 
-## Interactive demos :
+## Contents
 
-* light rays : https://b2renger.github.io/p5js_typo/light_rays/index.html
-* spot lights : https://b2renger.github.io/p5js_typo/spot_lights/index.html
-* 3d : https://b2renger.github.io/p5js_typo/3d/index.html
-* particles lines : https://b2renger.github.io/p5js_typo/particles_lines/index.html
-* particles attract / repel : https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html
-* scribble : https://b2renger.github.io/p5js_typo/scribble/index.html
-* tentacles : https://b2renger.github.io/p5js_typo/tentacles/index.html
+* [Interactive demos](#Interactive-demos)
+* [Tools](#Tools)
+* [Hands on tutorial](#Hands-on-tutorial)
+    * [Boilerplate code](#Boilerplate-code)
+        * [Loading a font and generating a path](#Loading-a-font-and-generating-a-path)
+        * [Gui creation](#Gui-creation)
+    * [Drawing code](#Drawing-code)
+
+
+## Interactive demos 
+
+### light rays
+![light ray image](assets/Light_rays.png)[**Demo**](https://b2renger.github.io/p5js_typo/light_rays/index.html) - [**Code**](https://github.com/b2renger/p5js_typo/tree/master/light_rays)
+
+### spot lights
+![spot light image](assets/spot_lights.png)[**Demo**](https://b2renger.github.io/p5js_typo/spot_lights/index.html) - [**Code**](https://github.com/b2renger/p5js_typo/tree/master/spot_lights)
+
+### 3d
+![3d image](assets/3d.png)
+[**Demo**](https://b2renger.github.io/p5js_typo/3d/index.html) - [**Code**](https://github.com/b2renger/p5js_typo/tree/master/3d)
+
+### particle lines
+![particle lines image](assets/particle_lines.png)[**Demo**](https://b2renger.github.io/p5js_typo/particles_lines/index.html) - [**Code**](https://github.com/b2renger/p5js_typo/tree/master/particles_lines)
+
+### particles attract repel
+![particle image](assets/particles.png) [**Demo**](https://b2renger.github.io/p5js_typo/particles_attract_repel/index.html) - [**Code**](https://github.com/b2renger/p5js_typo/tree/master/particles_attract_repel)
+
+### scribble 
+![scribble image](assets/scribble.png)[**Demo**](https://b2renger.github.io/p5js_typo/scribble/index.html) - [**Code](https://github.com/b2renger/p5js_typo/tree/master/scribble)
+
+### tentacles
+![tentacles image](assets/tentacles.png) [**Demo**](https://b2renger.github.io/p5js_typo/tentacles/index.html) - [**Code**](https://github.com/b2renger/p5js_typo)
+
+[**home**](#Contents)
+
 
 ## Tools
 
 ### Drawing Framework
 
-**p5xjs** 
+**p5js** 
 
 http://p5js.org/
 
@@ -58,7 +86,7 @@ https://github.com/dataarts/dat.gui
 
 dat.GUI is lightweight user interface library for js. It provides a collapsing drawer in which you can place sliders, buttons etc.
 
-
+[**home**](#Contents)
 
 ## Hands on tutorial
 
@@ -83,6 +111,8 @@ the *setup* is used to initialize all our variables, create a canvas etc. it is 
 the *draw* is an infinite loop that runs until the page is closed.
 
 A lot of the "boilerplate" code will happen in the former, whereas the actual drawing and interaction will happen in the later.
+
+[**home**](#Contents)
 
 ### Boilerplate code
 
@@ -165,6 +195,8 @@ var Parameters = function(){
 
 Quite a few things happened here, so let's break it down.
 
+[**home**](#Contents)
+
 #### Loading a font and generating a path
 
 First we create a few variables that will be handy.
@@ -201,6 +233,8 @@ it's pretty straight forward, and it runs with minimal changes from the Rune.fon
 http://printingcode.runemadsen.com/examples/typography/font/
 
 we have a callback for when the loading is actually finished. When it's done we can actually draw. However you'll notice that I use things like *params.font*, *params.spacing* instead of the "hardcoded values from the Rune documentation. This is because of the dat.GUI implementation for parameters. 
+
+[**home**](#Contents)
 
 #### Gui creation
 
@@ -267,6 +301,7 @@ those will be sliders as **params.spacing** and **params.size** are numeric valu
 
 You can also notice the **.listen()** which will make the gui elements listen to the changes that would come from the programm. It can be usefull when creating presets - for instance in the "tentacles" example.
 
+[**home**](#Contents)
 
 ### Drawing code
 
@@ -289,29 +324,7 @@ for (var i=0; i < polys.length ; i++){
            }
 }                
 ```
-
-## Examples details 
-
-### 3d
-![3d image](assets/3d.png)
-
-### light rays
-![light ray image](assets/Light_rays.png)
-
-### spot lights
-![spot light image](assets/spot_lights.png)
-
-### particle lines
-![particle lines image](assets/particle_lines.png)
-
-### particles attract repel
-![particle image](assets/particles.png)
-
-### scribble 
-![scribble image](assets/scribble.png)
-
-### tentacles
-![tentacles image](assets/tentacles.png)
+[**home**](#Contents)
 
 
 
