@@ -151,6 +151,7 @@
     let currentFont;
     let currentColor;
     let params = {};
+    let p5Font; // Store the loaded p5.js font
     
     // Tentacles specific
     let tentacles = [];
@@ -339,62 +340,57 @@
       
       params.font = currentFont;
       
-      // Load font and create path
-      f = new Rune.Font(currentFont);
-      f.load(function(err) {
-        if (err) {
-          console.error('Error loading font:', err);
-          return;
-        }
+      // Load font with p5.js for accurate bounds calculation
+      loadFont(currentFont, function(font) {
+        p5Font = font;
         
-        path = f.toPath(params.message, 0, 0, params.size);
-        polys = path.toPolygons({ spacing: params.spacing });
+        // Use p5.js to calculate accurate text bounds
+        textFont(p5Font);
+        textSize(params.size);
+        const bounds = p5Font.textBounds(params.message, 0, 0, params.size);
         
-        // Calculate actual text bounds for proper centering
-        // Find min and max x and y from all polygons
-        let minX = Infinity, maxX = -Infinity;
-        let minY = Infinity, maxY = -Infinity;
+        // Calculate center position based on p5.js bounds
+        const textWidth = bounds.w;
+        const textHeight = bounds.h;
         
-        for (let i = 0; i < polys.length; i++) {
-          let poly = polys[i];
-          for (let j = 0; j < poly.state.vectors.length; j++) {
-            let vec = poly.state.vectors[j];
-            if (vec.x < minX) minX = vec.x;
-            if (vec.x > maxX) maxX = vec.x;
-            if (vec.y < minY) minY = vec.y;
-            if (vec.y > maxY) maxY = vec.y;
+        // Center the text accounting for the bounds position
+        params.xoffset = (windowWidth - textWidth) / 2 - bounds.x;
+        params.yoffset = (windowHeight - textHeight) / 2 - bounds.y;
+        
+        // Now load the Rune font for generating polygons
+        f = new Rune.Font(currentFont);
+        f.load(function(err) {
+          if (err) {
+            console.error('Error loading font:', err);
+            return;
           }
-        }
-        
-        const textWidth = maxX - minX;
-        const textHeight = maxY - minY;
-        
-        // Center text horizontally and vertically based on actual dimensions
-        params.xoffset = (windowWidth - textWidth) / 2 - minX;
-        params.yoffset = (windowHeight - textHeight) / 2 - minY;
-        
-        // Initialize example-specific data
-        switch(currentExample) {
-          case 'tentacles':
-            // Clear background on each generation for tentacles
-            background(params.background || [0, 0, 0]);
-            initTentacles();
-            break;
-          case 'scribble':
-            // Scribble just needs the polys
-            break;
-          case 'light_rays':
-            // Light rays just needs the polys
-            break;
-          case 'spot_lights':
-            // Spot lights just needs the polys
-            break;
-          case '3d':
-            init3D();
-            break;
-        }
-        
-        drawing = true;
+          
+          path = f.toPath(params.message, 0, 0, params.size);
+          polys = path.toPolygons({ spacing: params.spacing });
+          
+          // Initialize example-specific data
+          switch(currentExample) {
+            case 'tentacles':
+              // Clear background on each generation for tentacles
+              background(params.background || [0, 0, 0]);
+              initTentacles();
+              break;
+            case 'scribble':
+              // Scribble just needs the polys
+              break;
+            case 'light_rays':
+              // Light rays just needs the polys
+              break;
+            case 'spot_lights':
+              // Spot lights just needs the polys
+              break;
+            case '3d':
+              init3D();
+              break;
+          }
+          
+          drawing = true;
+        });
       });
     }
     
