@@ -164,9 +164,43 @@
     // 3D specific
     let shapes = [];
     
-    // Random color generator (uses p5.js random)
+    // Random color generator (uses p5.js random) - ensures good contrast
     function randomColor() {
-      return [random(100, 255), random(50, 255), random(100, 255)];
+      return [random(150, 255), random(150, 255), random(150, 255)];
+    }
+    
+    // Random color with high saturation for better visibility
+    function randomBrightColor() {
+      const hue = random(360);
+      // Convert HSB to RGB for bright, saturated colors
+      colorMode(HSB, 360, 100, 100);
+      const c = color(hue, random(70, 100), random(80, 100));
+      colorMode(RGB, 255);
+      return [red(c), green(c), blue(c)];
+    }
+    
+    // Ensure contrast between background and foreground
+    function ensureContrast(bgColor, fgColor) {
+      // Calculate luminance
+      const getLuminance = (rgb) => {
+        const [r, g, b] = rgb;
+        return 0.299 * r + 0.587 * g + 0.114 * b;
+      };
+      
+      const bgLum = getLuminance(bgColor);
+      const fgLum = getLuminance(fgColor);
+      
+      // If contrast is too low, adjust foreground color
+      if (Math.abs(bgLum - fgLum) < 100) {
+        if (bgLum < 128) {
+          // Dark background, make foreground bright
+          return [random(200, 255), random(200, 255), random(200, 255)];
+        } else {
+          // Light background, make foreground dark
+          return [random(50, 100), random(50, 100), random(50, 100)];
+        }
+      }
+      return fgColor;
     }
     
     // Random font selector (uses native Math.random)
@@ -181,10 +215,12 @@
     
     // Get random preset config for each example
     function getTentaclesPreset() {
+      const bg = [0, 0, 0];
+      const fg = ensureContrast(bg, randomBrightColor());
       const presets = [
         { // dispertion_effect - optimized spacing from 0.75 to 2
-          background: [0, 0, 0],
-          color: randomColor(),
+          background: bg,
+          color: fg,
           spacing: 2,
           tnoiseMultiplicator: 5,
           tminRandom: 5,
@@ -193,7 +229,7 @@
         },
         { // fireworks_effect - optimized spacing from 3 to 5
           background: [0, 0, 0, 15],
-          color: randomColor().concat([15]),
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([15]),
           spacing: 5,
           tnoiseMultiplicator: 10,
           tminRandom: 5,
@@ -202,7 +238,7 @@
         },
         { // spiky_effect - optimized spacing from 5 to 8
           background: [0, 0, 0, 0],
-          color: randomColor().concat([20]),
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([20]),
           spacing: 8,
           tnoiseMultiplicator: 5,
           tminRandom: 5,
@@ -211,7 +247,7 @@
         },
         { // curly_effect - kept at 20
           background: [0, 0, 0, 0],
-          color: randomColor().concat([30]),
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([30]),
           spacing: 20,
           tnoiseMultiplicator: 45,
           tminRandom: 5,
@@ -223,6 +259,8 @@
     }
     
     function getScribblePreset() {
+      const bg = [0, 0, 0];
+      const fg = ensureContrast(bg, randomBrightColor());
       const presets = [
         { // optimized spacing from 100 to 50
           spacing: 50,
@@ -232,7 +270,7 @@
           stroke_weight: 1,
           shape_size: 0,
           shape: 0,
-          color: randomColor().concat([150])
+          color: fg.concat([150])
         },
         { // optimized spacing from 6 to 10
           spacing: 10,
@@ -242,7 +280,7 @@
           stroke_weight: 3,
           shape_size: 50,
           shape: 0,
-          color: randomColor().concat([150])
+          color: ensureContrast(bg, randomBrightColor()).concat([150])
         },
         { // optimized spacing from 6 to 10
           spacing: 10,
@@ -252,7 +290,7 @@
           stroke_weight: 0.5,
           shape_size: 50,
           shape: 0,
-          color: randomColor().concat([150])
+          color: ensureContrast(bg, randomBrightColor()).concat([150])
         },
         { // optimized spacing from 2 to 5
           spacing: 5,
@@ -262,38 +300,41 @@
           stroke_weight: 10,
           shape_size: 100,
           shape: 2,
-          color: randomColor().concat([2])
+          color: ensureContrast(bg, randomBrightColor()).concat([2])
         }
       ];
       return randomPreset(presets);
     }
     
     function getLightRaysPreset() {
+      const bg = [random(0, 50), random(0, 50), random(0, 50)];
       return {
         spacing: random(5, 20), // optimized from 1-25 to 5-20
-        background: [random(0, 50), random(0, 50), random(0, 50)],
-        color: randomColor(),
+        background: bg,
+        color: ensureContrast(bg, randomBrightColor()),
         stroke_weight: random(0.1, 5)
       };
     }
     
     function getSpotLightsPreset() {
+      const bg = [random(200, 255), random(200, 255), random(200, 255)];
       return {
         spacing: random(5, 20), // optimized from 2-20 to 5-20
-        background: [random(200, 255), random(200, 255), random(200, 255)],
-        color: randomColor(),
+        background: bg,
+        color: ensureContrast(bg, randomBrightColor()),
         stroke_weight: random(0.1, 5)
       };
     }
     
     function get3DPreset() {
+      const bg = [random(0, 50), random(0, 50), random(0, 50)];
       return {
         spacing: random(10, 30), // optimized from 5-30 to 10-30
-        background: [random(0, 50), random(0, 50), random(0, 50)],
+        background: bg,
         shape_size: random(15, 35),
         shape_type: floor(random(0, 7)),
-        alignement_x: random(-800, -200),
-        alignement_y: random(-100, 200),
+        alignement_x: 0, // Center horizontally instead of offsetting
+        alignement_y: 0, // Center vertically
         animation: 0,
         animation_speed: 0.025
       };
@@ -329,13 +370,19 @@
       params.message = 'ateliernum';
       
       // Responsive text size based on screen dimensions
+      // More aggressive scaling for narrow mobile screens
       const minDimension = min(windowWidth, windowHeight);
-      if (minDimension < 500) {
-        params.size = 200; // Small mobile devices
+      const maxDimension = max(windowWidth, windowHeight);
+      
+      if (minDimension < 400) {
+        // Very small mobile - scale based on width to fit text
+        params.size = minDimension * 0.35; // About 35% of smallest dimension
+      } else if (minDimension < 500) {
+        params.size = 180; // Small mobile devices
       } else if (minDimension < 800) {
-        params.size = 300; // Larger mobile/tablet
+        params.size = 280; // Larger mobile/tablet
       } else {
-        params.size = 400; // Desktop
+        params.size = 380; // Desktop
       }
       
       params.font = currentFont;
@@ -345,8 +392,11 @@
         p5Font = font;
         
         // Use p5.js to calculate accurate text bounds
-        textFont(p5Font);
-        textSize(params.size);
+        // Only set textFont in 2D mode - doesn't work in WEBGL
+        if (currentExample !== '3d') {
+          textFont(p5Font);
+          textSize(params.size);
+        }
         const bounds = p5Font.textBounds(params.message, 0, 0, params.size);
         
         // Calculate center position based on p5.js bounds
@@ -628,10 +678,10 @@
     }
     
     function draw3D() {
-      ambientLight(25);
-      directionalLight(200, 0, 0, 0.55, 0.25, 0.25);
-      directionalLight(0, 200, 0, -0.55, -0.25, -0.25);
-      directionalLight(0, 0, 200, 0, 0.5, -0.3);
+      ambientLight(50); // Increase ambient light for better visibility
+      directionalLight(255, 255, 255, 0.55, 0.25, 0.25);
+      directionalLight(255, 255, 255, -0.55, -0.25, -0.25);
+      directionalLight(255, 255, 255, 0, 0.5, -0.3);
       pointLight(255, 255, 255, mouseX - width / 2, mouseY - height / 2, 200);
       
       push();
@@ -640,7 +690,9 @@
       for (let i = 0; i < shapes.length; i++) {
         shapes[i].update();
         shapes[i].drag(mouseX, mouseY);
-        fill(random(100, 255), random(100, 255), random(100, 255));
+        // Use bright, saturated colors for 3D shapes
+        const brightCol = randomBrightColor();
+        fill(brightCol[0], brightCol[1], brightCol[2]);
         shapes[i].display();
       }
       pop();
