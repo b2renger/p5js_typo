@@ -15,40 +15,43 @@
       font-family: 'Arial', sans-serif;
       background: #000;
       color: #fff;
+      overflow: hidden;
     }
     
     .controls {
       position: fixed;
-      top: 20px;
-      left: 20px;
+      top: 10px;
+      left: 10px;
       z-index: 1000;
-      background: rgba(0, 0, 0, 0.8);
-      padding: 20px;
+      background: rgba(0, 0, 0, 0.9);
+      padding: 15px;
       border-radius: 8px;
-      min-width: 250px;
+      min-width: 200px;
+      max-width: 90vw;
     }
     
     .controls h2 {
       margin-top: 0;
-      font-size: 18px;
+      margin-bottom: 10px;
+      font-size: 16px;
       color: #ed225d;
     }
     
     .control-group {
-      margin-bottom: 15px;
+      margin-bottom: 10px;
     }
     
     .control-group label {
       display: block;
       margin-bottom: 5px;
-      font-size: 14px;
+      font-size: 12px;
     }
     
     .control-group select,
     .control-group button {
       width: 100%;
-      padding: 10px;
-      font-size: 14px;
+      padding: 8px;
+      font-size: 13px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
@@ -68,6 +71,43 @@
     
     .control-group button:hover {
       background: #c71d4f;
+    }
+    
+    /* Mobile optimizations */
+    @media (max-width: 768px) {
+      .controls {
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        padding: 10px;
+        min-width: auto;
+      }
+      
+      .controls h2 {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      
+      .control-group {
+        margin-bottom: 8px;
+      }
+      
+      .control-group label {
+        font-size: 11px;
+      }
+      
+      .control-group select,
+      .control-group button {
+        padding: 6px;
+        font-size: 12px;
+      }
+    }
+    
+    @media (orientation: landscape) and (max-height: 500px) {
+      .controls {
+        max-height: 90vh;
+        overflow-y: auto;
+      }
     }
   </style>
 </head>
@@ -146,34 +186,34 @@
     // Get random preset config for each example
     function getTentaclesPreset() {
       const presets = [
-        { // dispertion_effect
+        { // dispertion_effect - optimized spacing from 0.75 to 2
           background: [0, 0, 0],
           color: randomColor(),
-          spacing: 0.75,
+          spacing: 2,
           tnoiseMultiplicator: 5,
           tminRandom: 5,
           tmaxRandom: 10,
           tdimStep: 0.07
         },
-        { // fireworks_effect
+        { // fireworks_effect - optimized spacing from 3 to 5
           background: [0, 0, 0, 15],
           color: randomColor().concat([15]),
-          spacing: 3,
+          spacing: 5,
           tnoiseMultiplicator: 10,
           tminRandom: 5,
           tmaxRandom: 10,
           tdimStep: 0.07
         },
-        { // spiky_effect
+        { // spiky_effect - optimized spacing from 5 to 8
           background: [0, 0, 0, 0],
           color: randomColor().concat([20]),
-          spacing: 5,
+          spacing: 8,
           tnoiseMultiplicator: 5,
           tminRandom: 5,
           tmaxRandom: 10,
           tdimStep: 0.07
         },
-        { // curly_effect
+        { // curly_effect - kept at 20
           background: [0, 0, 0, 0],
           color: randomColor().concat([30]),
           spacing: 20,
@@ -188,8 +228,8 @@
     
     function getScribblePreset() {
       const presets = [
-        {
-          spacing: 100,
+        { // optimized spacing from 100 to 50
+          spacing: 50,
           bowing: 1,
           roughness: 5,
           maxOffset: 1.2,
@@ -198,8 +238,8 @@
           shape: 0,
           color: randomColor().concat([150])
         },
-        {
-          spacing: 6,
+        { // optimized spacing from 6 to 10
+          spacing: 10,
           bowing: 313,
           roughness: 1,
           maxOffset: 3.2,
@@ -208,8 +248,8 @@
           shape: 0,
           color: randomColor().concat([150])
         },
-        {
-          spacing: 6,
+        { // optimized spacing from 6 to 10
+          spacing: 10,
           bowing: 1,
           roughness: 26,
           maxOffset: 1,
@@ -218,8 +258,8 @@
           shape: 0,
           color: randomColor().concat([150])
         },
-        {
-          spacing: 2,
+        { // optimized spacing from 2 to 5
+          spacing: 5,
           bowing: 1,
           roughness: 1,
           maxOffset: 1,
@@ -234,15 +274,15 @@
     
     function getParticlesLinesPreset() {
       const presets = [
-        {
-          spacing: 20,
+        { // optimized spacing from 20 to 30
+          spacing: 30,
           background: [0, 0, 0, 150],
           color: randomColor(),
           strokeWeight: 0.51,
           threshold: 50,
           show_particles: true
         },
-        {
+        { // kept at 40
           spacing: 40,
           background: [0, 0, 0, 5],
           color: randomColor(),
@@ -250,8 +290,8 @@
           threshold: 75,
           show_particles: false
         },
-        {
-          spacing: 8,
+        { // optimized spacing from 8 to 15
+          spacing: 15,
           background: [0, 0, 0],
           color: randomColor(),
           strokeWeight: 0.41,
@@ -264,15 +304,15 @@
     
     function getParticlesAttractRepelPreset() {
       const presets = [
-        {
-          spacing: 20,
+        { // optimized spacing from 20 to 30
+          spacing: 30,
           background: [0, 0, 0, 150],
           color: randomColor(),
           particle_size: 10,
           repulsion_threshold: 100
         },
-        {
-          spacing: 10,
+        { // optimized spacing from 10 to 20
+          spacing: 20,
           background: [0, 0, 0, 5],
           color: randomColor(),
           particle_size: 5,
@@ -284,7 +324,7 @@
     
     function getLightRaysPreset() {
       return {
-        spacing: random(1, 25),
+        spacing: random(5, 20), // optimized from 1-25 to 5-20
         background: [random(0, 50), random(0, 50), random(0, 50)],
         color: randomColor(),
         stroke_weight: random(0.1, 5)
@@ -293,7 +333,7 @@
     
     function getSpotLightsPreset() {
       return {
-        spacing: random(2, 20),
+        spacing: random(5, 20), // optimized from 2-20 to 5-20
         background: [random(200, 255), random(200, 255), random(200, 255)],
         color: randomColor(),
         stroke_weight: random(0.1, 5)
@@ -302,7 +342,7 @@
     
     function get3DPreset() {
       return {
-        spacing: random(5, 30),
+        spacing: random(10, 30), // optimized from 5-30 to 10-30
         background: [random(0, 50), random(0, 50), random(0, 50)],
         shape_size: random(15, 35),
         shape_type: floor(random(0, 7)),
@@ -347,9 +387,23 @@
       }
       
       params.message = 'ateliernum';
-      params.size = 400;
+      
+      // Responsive text size based on screen dimensions
+      const minDimension = min(windowWidth, windowHeight);
+      if (minDimension < 500) {
+        params.size = 200; // Small mobile devices
+      } else if (minDimension < 800) {
+        params.size = 300; // Larger mobile/tablet
+      } else {
+        params.size = 400; // Desktop
+      }
+      
       params.font = currentFont;
-      params.xoffset = windowWidth / 3;
+      
+      // Center text horizontally and vertically
+      // The text will be translated, so we need to calculate offset from text dimensions
+      // For now, use a simple centering approach
+      params.xoffset = windowWidth / 2 - params.size / 2;
       params.yoffset = windowHeight / 2;
       
       // Load font and create path
