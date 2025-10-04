@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5.js Typography Showcase</title>
+  <script src="libraries/p5.js"></script>
+  <script src="libraries/rune.js"></script>
+  <script src="libraries/rune.font.js"></script>
+  <script src="libraries/p5.scribble.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: #000;
+      color: #fff;
+    }
+    
+    .controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 8px;
+      min-width: 250px;
+    }
+    
+    .controls h2 {
+      margin-top: 0;
+      font-size: 18px;
+      color: #ed225d;
+    }
+    
+    .control-group {
+      margin-bottom: 15px;
+    }
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+    
+    .control-group select,
+    .control-group button {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .control-group select {
+      background: #333;
+      color: #fff;
+    }
+    
+    .control-group button {
+      background: #ed225d;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    
+    .control-group button:hover {
+      background: #c71d4f;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <h2>Typography Showcase</h2>
+    <div class="control-group">
+      <label for="exampleSelect">Select Example:</label>
+      <select id="exampleSelect">
+        <option value="tentacles">Tentacles</option>
+        <option value="scribble">Scribble</option>
+        <option value="particles_lines">Particles Lines</option>
+        <option value="particles_attract_repel">Particles Attract/Repel</option>
+        <option value="light_rays">Light Rays</option>
+        <option value="spot_lights">Spot Lights</option>
+        <option value="3d">3D</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <button id="generateBtn">Generate</button>
+    </div>
+  </div>
+
+  <script>
+    // Available fonts
+    const fonts = [
+      "fonts/AvenirNextLTW01-Medium.woff",
+      "fonts/Black_Ops_One/BlackOpsOne-Regular.ttf",
+      "fonts/Comfortaa/Comfortaa-Bold.ttf",
+      "fonts/Nova_Mono/NovaMono.ttf",
+      "fonts/Shadows_Into_Light/ShadowsIntoLight.ttf",
+      "fonts/Sniglet/Sniglet-ExtraBold.ttf",
+      "fonts/Tangerine/Tangerine_Bold.ttf",
+      "fonts/Unica_One/UnicaOne-Regular.ttf"
+    ];
+
+    // Global variables
+    let f;
+    let path;
+    let polys;
+    let drawing = false;
+    let currentExample = 'tentacles';
+    let currentFont;
+    let currentColor;
+    let params = {};
+    
+    // Tentacles specific
+    let tentacles = [];
+    let anchorX, anchorY;
+    
+    // Scribble specific
+    let scribble;
+    let seed;
+    
+    // Particles specific
+    let particles = [];
+    
+    // 3D specific
+    let shapes = [];
+    
+    // Random color generator (uses p5.js random)
+    function randomColor() {
+      return [random(100, 255), random(50, 255), random(100, 255)];
+    }
+    
+    // Random font selector (uses native Math.random)
+    function randomFont() {
+      return fonts[Math.floor(Math.random() * fonts.length)];
+    }
+    
+    // Random array element selector (uses p5.js random)
+    function randomPreset(presets) {
+      return presets[Math.floor(Math.random() * presets.length)];
+    }
+    
+    // Get random preset config for each example
+    function getTentaclesPreset() {
+      const presets = [
+        { // dispertion_effect
+          background: [0, 0, 0],
+          color: randomColor(),
+          spacing: 0.75,
+          tnoiseMultiplicator: 5,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        { // fireworks_effect
+          background: [0, 0, 0, 15],
+          color: randomColor().concat([15]),
+          spacing: 3,
+          tnoiseMultiplicator: 10,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        { // spiky_effect
+          background: [0, 0, 0, 0],
+          color: randomColor().concat([20]),
+          spacing: 5,
+          tnoiseMultiplicator: 5,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        { // curly_effect
+          background: [0, 0, 0, 0],
+          color: randomColor().concat([30]),
+          spacing: 20,
+          tnoiseMultiplicator: 45,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getScribblePreset() {
+      const presets = [
+        {
+          spacing: 100,
+          bowing: 1,
+          roughness: 5,
+          maxOffset: 1.2,
+          stroke_weight: 1,
+          shape_size: 0,
+          shape: 0,
+          color: randomColor().concat([150])
+        },
+        {
+          spacing: 6,
+          bowing: 313,
+          roughness: 1,
+          maxOffset: 3.2,
+          stroke_weight: 3,
+          shape_size: 50,
+          shape: 0,
+          color: randomColor().concat([150])
+        },
+        {
+          spacing: 6,
+          bowing: 1,
+          roughness: 26,
+          maxOffset: 1,
+          stroke_weight: 0.5,
+          shape_size: 50,
+          shape: 0,
+          color: randomColor().concat([150])
+        },
+        {
+          spacing: 2,
+          bowing: 1,
+          roughness: 1,
+          maxOffset: 1,
+          stroke_weight: 10,
+          shape_size: 100,
+          shape: 2,
+          color: randomColor().concat([2])
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getParticlesLinesPreset() {
+      const presets = [
+        {
+          spacing: 20,
+          background: [0, 0, 0, 150],
+          color: randomColor(),
+          strokeWeight: 0.51,
+          threshold: 50,
+          show_particles: true
+        },
+        {
+          spacing: 40,
+          background: [0, 0, 0, 5],
+          color: randomColor(),
+          strokeWeight: 0.25,
+          threshold: 75,
+          show_particles: false
+        },
+        {
+          spacing: 8,
+          background: [0, 0, 0],
+          color: randomColor(),
+          strokeWeight: 0.41,
+          threshold: 85,
+          show_particles: false
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getParticlesAttractRepelPreset() {
+      const presets = [
+        {
+          spacing: 20,
+          background: [0, 0, 0, 150],
+          color: randomColor(),
+          particle_size: 10,
+          repulsion_threshold: 100
+        },
+        {
+          spacing: 10,
+          background: [0, 0, 0, 5],
+          color: randomColor(),
+          particle_size: 5,
+          repulsion_threshold: 200
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getLightRaysPreset() {
+      return {
+        spacing: random(1, 25),
+        background: [random(0, 50), random(0, 50), random(0, 50)],
+        color: randomColor(),
+        stroke_weight: random(0.1, 5)
+      };
+    }
+    
+    function getSpotLightsPreset() {
+      return {
+        spacing: random(2, 20),
+        background: [random(200, 255), random(200, 255), random(200, 255)],
+        color: randomColor(),
+        stroke_weight: random(0.1, 5)
+      };
+    }
+    
+    function get3DPreset() {
+      return {
+        spacing: random(5, 30),
+        background: [random(0, 50), random(0, 50), random(0, 50)],
+        shape_size: random(15, 35),
+        shape_type: floor(random(0, 7)),
+        alignement_x: random(-800, -200),
+        alignement_y: random(-100, 200),
+        animation: 0,
+        animation_speed: 0.025
+      };
+    }
+    
+    // Load and generate typography
+    function generateTypography() {
+      drawing = false;
+      
+      // Get random font and color
+      currentFont = randomFont();
+      
+      // Get preset based on current example
+      switch(currentExample) {
+        case 'tentacles':
+          params = getTentaclesPreset();
+          break;
+        case 'scribble':
+          params = getScribblePreset();
+          seed = random(1000);
+          break;
+        case 'particles_lines':
+          params = getParticlesLinesPreset();
+          break;
+        case 'particles_attract_repel':
+          params = getParticlesAttractRepelPreset();
+          break;
+        case 'light_rays':
+          params = getLightRaysPreset();
+          break;
+        case 'spot_lights':
+          params = getSpotLightsPreset();
+          break;
+        case '3d':
+          params = get3DPreset();
+          break;
+      }
+      
+      params.message = 'ateliernum';
+      params.size = 400;
+      params.font = currentFont;
+      params.xoffset = windowWidth / 3;
+      params.yoffset = windowHeight / 2;
+      
+      // Load font and create path
+      f = new Rune.Font(currentFont);
+      f.load(function(err) {
+        if (err) {
+          console.error('Error loading font:', err);
+          return;
+        }
+        
+        path = f.toPath(params.message, 0, 0, params.size);
+        polys = path.toPolygons({ spacing: params.spacing });
+        
+        // Initialize example-specific data
+        switch(currentExample) {
+          case 'tentacles':
+            initTentacles();
+            break;
+          case 'scribble':
+            // Scribble just needs the polys
+            break;
+          case 'particles_lines':
+            initParticlesLines();
+            break;
+          case 'particles_attract_repel':
+            initParticlesAttractRepel();
+            break;
+          case 'light_rays':
+            // Light rays just needs the polys
+            break;
+          case 'spot_lights':
+            // Spot lights just needs the polys
+            break;
+          case '3d':
+            init3D();
+            break;
+        }
+        
+        drawing = true;
+      });
+    }
+    
+    // Initialize tentacles
+    function initTentacles() {
+      tentacles = [];
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          tentacles.push(new Tentacle(
+            vec.x, vec.y,
+            params.tnoiseMultiplicator,
+            params.tminRandom,
+            params.tmaxRandom,
+            params.tdimStep
+          ));
+        }
+      }
+    }
+    
+    // Tentacle class
+    function Tentacle(x, y, noiseM, minRand, maxRand, dimStep) {
+      this.x = x;
+      this.y = y;
+      this.minRandom = minRand;
+      this.maxRandom = maxRand;
+      this.dimStep = dimStep;
+      this.size = random(this.minRandom, this.maxRandom);
+      this.angle = random(360);
+      this.radius = 0;
+      this.noiseFactor = random(500);
+      this.noiseMultiplicator = noiseM;
+      
+      this.draw = function() {
+        this.radius += 1;
+        this.angle = this.angle + noise(this.noiseFactor, 10) * this.noiseMultiplicator - this.noiseMultiplicator / 2;
+        this.size -= this.dimStep;
+        this.noiseFactor += 0.005;
+        
+        fill(params.color);
+        noStroke();
+        let drawX = this.x + this.radius * cos(radians(this.angle));
+        let drawY = this.y + this.radius * sin(radians(this.angle));
+        ellipse(drawX, drawY, this.size, this.size);
+        
+        if (this.size < 0) {
+          this.angle = random(360);
+          this.radius = 0;
+          this.noiseFactor = random(500);
+          this.size = random(this.minRandom, this.maxRandom);
+        }
+      };
+    }
+    
+    // Initialize particles for particles_lines
+    function initParticlesLines() {
+      particles = [];
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          particles.push(new ParticleLine(vec.x, vec.y));
+        }
+      }
+    }
+    
+    // ParticleLine class
+    function ParticleLine(anchorX, anchorY) {
+      this.x = random(windowWidth);
+      this.y = random(windowHeight);
+      this.anchorx = anchorX;
+      this.anchory = anchorY;
+      this.vx = 0;
+      this.vy = 0;
+      
+      this.update = function() {
+        let dx = this.anchorx - this.x;
+        let dy = this.anchory - this.y;
+        this.vx += dx * 0.01;
+        this.vy += dy * 0.01;
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.95;
+        this.vy *= 0.95;
+      };
+      
+      this.draw = function() {
+        if (params.show_particles) {
+          fill(params.color);
+          noStroke();
+          ellipse(this.x, this.y, 3, 3);
+        }
+        
+        for (let i = 0; i < particles.length; i++) {
+          if (particles[i] !== this) {
+            let d = dist(this.x, this.y, particles[i].x, particles[i].y);
+            if (d < params.threshold) {
+              stroke(params.color);
+              strokeWeight(params.strokeWeight);
+              line(this.x, this.y, particles[i].x, particles[i].y);
+            }
+          }
+        }
+      };
+    }
+    
+    // Initialize particles for attract/repel
+    function initParticlesAttractRepel() {
+      particles = [];
+      for (let j = 0; j < polys.length; j++) {
+        let poly = polys[j];
+        for (let k = 0; k < poly.state.vectors.length; k++) {
+          let vec = poly.state.vectors[k];
+          particles.push(new ParticleAttractRepel(
+            random(windowWidth),
+            random(windowHeight),
+            vec.x,
+            vec.y
+          ));
+        }
+      }
+    }
+    
+    // ParticleAttractRepel class
+    function ParticleAttractRepel(x, y, anchorX, anchorY) {
+      this.x = x;
+      this.y = y;
+      this.anchorx = anchorX;
+      this.anchory = anchorY;
+      this.vx = 0;
+      this.vy = 0;
+      
+      this.attract = function() {
+        let dx = this.anchorx - this.x;
+        let dy = this.anchory - this.y;
+        this.vx += dx * 0.003;
+        this.vy += dy * 0.003;
+      };
+      
+      this.repulse = function(mx, my) {
+        let d = dist(this.x, this.y, mx, my);
+        if (d < params.repulsion_threshold) {
+          let angle = atan2(this.y - my, this.x - mx);
+          let force = (params.repulsion_threshold - d) / params.repulsion_threshold;
+          this.vx += cos(angle) * force * 2;
+          this.vy += sin(angle) * force * 2;
+        }
+      };
+      
+      this.check_bounds = function() {
+        if (this.x < 0 || this.x > windowWidth) this.vx *= -0.5;
+        if (this.y < 0 || this.y > windowHeight) this.vy *= -0.5;
+      };
+      
+      this.update = function() {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.vx *= 0.95;
+        this.vy *= 0.95;
+      };
+      
+      this.draw = function() {
+        fill(params.color);
+        noStroke();
+        ellipse(this.x, this.y, params.particle_size, params.particle_size);
+      };
+    }
+    
+    // Initialize 3D shapes
+    function init3D() {
+      shapes = [];
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          shapes.push(new Shape3D(vec.x, vec.y, 0));
+        }
+      }
+    }
+    
+    // Shape3D class
+    function Shape3D(x, y, z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.anchorx = x;
+      this.anchory = y;
+      this.anchorz = z;
+      this.oriX = 0;
+      this.oriY = 0;
+      
+      this.update = function() {
+        if (params.animation === 0) {
+          this.x = lerp(this.x, this.anchorx, params.animation_speed);
+          this.y = lerp(this.y, this.anchory, params.animation_speed);
+          this.z = lerp(this.z, this.anchorz, params.animation_speed);
+        } else {
+          this.x = lerp(this.x, random(-200, 200), params.animation_speed);
+          this.y = lerp(this.y, random(-200, 200), params.animation_speed);
+          this.z = lerp(this.z, random(-200, 200), params.animation_speed);
+        }
+      };
+      
+      this.display = function() {
+        push();
+        translate(this.x, this.y, this.z);
+        rotateY(map(this.oriX, 0, windowWidth, -PI, PI));
+        rotateX(map(this.oriY, 0, windowHeight, -PI, PI));
+        this.drawShape();
+        pop();
+      };
+      
+      this.drag = function(x, y) {
+        this.oriX = x;
+        this.oriY = y;
+      };
+      
+      this.drawShape = function() {
+        switch(params.shape_type) {
+          case 0: cone(params.shape_size, params.shape_size); break;
+          case 1: ellipsoid(params.shape_size, params.shape_size, params.shape_size); break;
+          case 2: torus(params.shape_size, params.shape_size / 3); break;
+          case 3: cylinder(params.shape_size, params.shape_size); break;
+          case 4: sphere(params.shape_size); break;
+          case 5: box(params.shape_size); break;
+          case 6: plane(params.shape_size, params.shape_size); break;
+        }
+      };
+    }
+    
+    // p5.js setup
+    function setup() {
+      if (currentExample === '3d') {
+        createCanvas(windowWidth, windowHeight, WEBGL);
+      } else {
+        createCanvas(windowWidth, windowHeight);
+      }
+      
+      scribble = new Scribble();
+      anchorX = windowWidth / 2;
+      anchorY = windowHeight / 2;
+      
+      background(0);
+      
+      // Don't generate on page load - wait for user to click Generate button
+    }
+    
+    // p5.js draw
+    function draw() {
+      if (!drawing) return;
+      
+      background(params.background || [0, 0, 0]);
+      
+      switch(currentExample) {
+        case 'tentacles':
+          drawTentacles();
+          break;
+        case 'scribble':
+          drawScribble();
+          break;
+        case 'particles_lines':
+          drawParticlesLines();
+          break;
+        case 'particles_attract_repel':
+          drawParticlesAttractRepel();
+          break;
+        case 'light_rays':
+          drawLightRays();
+          break;
+        case 'spot_lights':
+          drawSpotLights();
+          break;
+        case '3d':
+          draw3D();
+          break;
+      }
+    }
+    
+    function drawTentacles() {
+      push();
+      translate(params.xoffset, params.yoffset);
+      for (let i = 0; i < tentacles.length; i++) {
+        tentacles[i].draw();
+      }
+      pop();
+    }
+    
+    function drawScribble() {
+      scribble.bowing = params.bowing;
+      scribble.roughness = params.roughness;
+      scribble.maxOffset = params.maxOffset;
+      randomSeed(seed);
+      
+      push();
+      translate(params.xoffset, params.yoffset);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 1; j < poly.state.vectors.length; j++) {
+          let vec1 = poly.state.vectors[j];
+          let vec2 = poly.state.vectors[j - 1];
+          noFill();
+          stroke(params.color);
+          strokeWeight(params.stroke_weight);
+          
+          if (params.shape === 0) {
+            scribble.scribbleLine(vec1.x, vec1.y, vec2.x, vec2.y);
+          } else if (params.shape === 1) {
+            scribble.scribbleEllipse(vec1.x, vec1.y, params.shape_size, params.shape_size);
+          } else if (params.shape === 2) {
+            scribble.scribbleRect(vec1.x, vec1.y, params.shape_size, params.shape_size);
+          }
+        }
+      }
+      pop();
+    }
+    
+    function drawParticlesLines() {
+      push();
+      translate(params.xoffset, params.yoffset);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update();
+        particles[i].draw();
+      }
+      pop();
+    }
+    
+    function drawParticlesAttractRepel() {
+      push();
+      translate(params.xoffset, params.yoffset);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].attract();
+        particles[i].repulse(mouseX - params.xoffset, mouseY - params.yoffset);
+        particles[i].check_bounds();
+        particles[i].update();
+        particles[i].draw();
+      }
+      pop();
+    }
+    
+    function drawLightRays() {
+      push();
+      translate(params.xoffset, params.yoffset);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          line(anchorX - params.xoffset, anchorY - params.yoffset, vec.x, vec.y);
+        }
+      }
+      pop();
+    }
+    
+    function drawSpotLights() {
+      push();
+      translate(params.xoffset, params.yoffset);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          let angle = atan2(vec.y - (anchorY - params.yoffset), vec.x - (anchorX - params.xoffset));
+          let len = random(50, 150);
+          let endX = vec.x + cos(angle) * len;
+          let endY = vec.y + sin(angle) * len;
+          line(vec.x, vec.y, endX, endY);
+        }
+      }
+      pop();
+    }
+    
+    function draw3D() {
+      ambientLight(25);
+      directionalLight(200, 0, 0, 0.55, 0.25, 0.25);
+      directionalLight(0, 200, 0, -0.55, -0.25, -0.25);
+      directionalLight(0, 0, 200, 0, 0.5, -0.3);
+      pointLight(255, 255, 255, mouseX - width / 2, mouseY - height / 2, 200);
+      
+      push();
+      translate(params.alignement_x, params.alignement_y, 0);
+      
+      for (let i = 0; i < shapes.length; i++) {
+        shapes[i].update();
+        shapes[i].drag(mouseX, mouseY);
+        fill(random(100, 255), random(100, 255), random(100, 255));
+        shapes[i].display();
+      }
+      pop();
+    }
+    
+    function mouseDragged() {
+      if (currentExample === 'light_rays' || currentExample === 'spot_lights') {
+        anchorX = mouseX;
+        anchorY = mouseY;
+      }
+    }
+    
+    // Event listeners
+    document.getElementById('exampleSelect').addEventListener('change', function(e) {
+      currentExample = e.target.value;
+      
+      // Recreate canvas with correct renderer
+      if (currentExample === '3d') {
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+        createCanvas(windowWidth, windowHeight, WEBGL);
+      } else {
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+        createCanvas(windowWidth, windowHeight);
+      }
+      
+      // Don't auto-generate, wait for button click
+    });
+    
+    document.getElementById('generateBtn').addEventListener('click', function() {
+      generateTypography();
+    });
+  </script>
+</body>
+</html>
