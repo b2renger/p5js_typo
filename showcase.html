@@ -119,8 +119,6 @@
       <select id="exampleSelect">
         <option value="tentacles">Tentacles</option>
         <option value="scribble">Scribble</option>
-        <option value="particles_lines">Particles Lines</option>
-        <option value="particles_attract_repel">Particles Attract/Repel</option>
         <option value="light_rays">Light Rays</option>
         <option value="spot_lights">Spot Lights</option>
         <option value="3d">3D</option>
@@ -161,9 +159,6 @@
     // Scribble specific
     let scribble;
     let seed;
-    
-    // Particles specific
-    let particles = [];
     
     // 3D specific
     let shapes = [];
@@ -272,56 +267,6 @@
       return randomPreset(presets);
     }
     
-    function getParticlesLinesPreset() {
-      const presets = [
-        { // optimized spacing from 20 to 30
-          spacing: 30,
-          background: [0, 0, 0, 150],
-          color: randomColor(),
-          strokeWeight: 0.51,
-          threshold: 50,
-          show_particles: true
-        },
-        { // kept at 40
-          spacing: 40,
-          background: [0, 0, 0, 5],
-          color: randomColor(),
-          strokeWeight: 0.25,
-          threshold: 75,
-          show_particles: false
-        },
-        { // optimized spacing from 8 to 15
-          spacing: 15,
-          background: [0, 0, 0],
-          color: randomColor(),
-          strokeWeight: 0.41,
-          threshold: 85,
-          show_particles: false
-        }
-      ];
-      return randomPreset(presets);
-    }
-    
-    function getParticlesAttractRepelPreset() {
-      const presets = [
-        { // optimized spacing from 20 to 30
-          spacing: 30,
-          background: [0, 0, 0, 150],
-          color: randomColor(),
-          particle_size: 10,
-          repulsion_threshold: 100
-        },
-        { // optimized spacing from 10 to 20
-          spacing: 20,
-          background: [0, 0, 0, 5],
-          color: randomColor(),
-          particle_size: 5,
-          repulsion_threshold: 200
-        }
-      ];
-      return randomPreset(presets);
-    }
-    
     function getLightRaysPreset() {
       return {
         spacing: random(5, 20), // optimized from 1-25 to 5-20
@@ -369,12 +314,6 @@
           params = getScribblePreset();
           seed = random(1000);
           break;
-        case 'particles_lines':
-          params = getParticlesLinesPreset();
-          break;
-        case 'particles_attract_repel':
-          params = getParticlesAttractRepelPreset();
-          break;
         case 'light_rays':
           params = getLightRaysPreset();
           break;
@@ -400,12 +339,6 @@
       
       params.font = currentFont;
       
-      // Center text horizontally and vertically
-      // The text will be translated, so we need to calculate offset from text dimensions
-      // For now, use a simple centering approach
-      params.xoffset = windowWidth / 2 - params.size / 2;
-      params.yoffset = windowHeight / 2;
-      
       // Load font and create path
       f = new Rune.Font(currentFont);
       f.load(function(err) {
@@ -417,19 +350,38 @@
         path = f.toPath(params.message, 0, 0, params.size);
         polys = path.toPolygons({ spacing: params.spacing });
         
+        // Calculate actual text bounds for proper centering
+        // Find min and max x and y from all polygons
+        let minX = Infinity, maxX = -Infinity;
+        let minY = Infinity, maxY = -Infinity;
+        
+        for (let i = 0; i < polys.length; i++) {
+          let poly = polys[i];
+          for (let j = 0; j < poly.state.vectors.length; j++) {
+            let vec = poly.state.vectors[j];
+            if (vec.x < minX) minX = vec.x;
+            if (vec.x > maxX) maxX = vec.x;
+            if (vec.y < minY) minY = vec.y;
+            if (vec.y > maxY) maxY = vec.y;
+          }
+        }
+        
+        const textWidth = maxX - minX;
+        const textHeight = maxY - minY;
+        
+        // Center text horizontally and vertically based on actual dimensions
+        params.xoffset = (windowWidth - textWidth) / 2 - minX;
+        params.yoffset = (windowHeight - textHeight) / 2 - minY;
+        
         // Initialize example-specific data
         switch(currentExample) {
           case 'tentacles':
+            // Clear background on each generation for tentacles
+            background(params.background || [0, 0, 0]);
             initTentacles();
             break;
           case 'scribble':
             // Scribble just needs the polys
-            break;
-          case 'particles_lines':
-            initParticlesLines();
-            break;
-          case 'particles_attract_repel':
-            initParticlesAttractRepel();
             break;
           case 'light_rays':
             // Light rays just needs the polys
@@ -495,120 +447,6 @@
           this.noiseFactor = random(500);
           this.size = random(this.minRandom, this.maxRandom);
         }
-      };
-    }
-    
-    // Initialize particles for particles_lines
-    function initParticlesLines() {
-      particles = [];
-      for (let i = 0; i < polys.length; i++) {
-        let poly = polys[i];
-        for (let j = 0; j < poly.state.vectors.length; j++) {
-          let vec = poly.state.vectors[j];
-          particles.push(new ParticleLine(vec.x, vec.y));
-        }
-      }
-    }
-    
-    // ParticleLine class
-    function ParticleLine(anchorX, anchorY) {
-      this.x = random(windowWidth);
-      this.y = random(windowHeight);
-      this.anchorx = anchorX;
-      this.anchory = anchorY;
-      this.vx = 0;
-      this.vy = 0;
-      
-      this.update = function() {
-        let dx = this.anchorx - this.x;
-        let dy = this.anchory - this.y;
-        this.vx += dx * 0.01;
-        this.vy += dy * 0.01;
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= 0.95;
-        this.vy *= 0.95;
-      };
-      
-      this.draw = function() {
-        if (params.show_particles) {
-          fill(params.color);
-          noStroke();
-          ellipse(this.x, this.y, 3, 3);
-        }
-        
-        for (let i = 0; i < particles.length; i++) {
-          if (particles[i] !== this) {
-            let d = dist(this.x, this.y, particles[i].x, particles[i].y);
-            if (d < params.threshold) {
-              stroke(params.color);
-              strokeWeight(params.strokeWeight);
-              line(this.x, this.y, particles[i].x, particles[i].y);
-            }
-          }
-        }
-      };
-    }
-    
-    // Initialize particles for attract/repel
-    function initParticlesAttractRepel() {
-      particles = [];
-      for (let j = 0; j < polys.length; j++) {
-        let poly = polys[j];
-        for (let k = 0; k < poly.state.vectors.length; k++) {
-          let vec = poly.state.vectors[k];
-          particles.push(new ParticleAttractRepel(
-            random(windowWidth),
-            random(windowHeight),
-            vec.x,
-            vec.y
-          ));
-        }
-      }
-    }
-    
-    // ParticleAttractRepel class
-    function ParticleAttractRepel(x, y, anchorX, anchorY) {
-      this.x = x;
-      this.y = y;
-      this.anchorx = anchorX;
-      this.anchory = anchorY;
-      this.vx = 0;
-      this.vy = 0;
-      
-      this.attract = function() {
-        let dx = this.anchorx - this.x;
-        let dy = this.anchory - this.y;
-        this.vx += dx * 0.003;
-        this.vy += dy * 0.003;
-      };
-      
-      this.repulse = function(mx, my) {
-        let d = dist(this.x, this.y, mx, my);
-        if (d < params.repulsion_threshold) {
-          let angle = atan2(this.y - my, this.x - mx);
-          let force = (params.repulsion_threshold - d) / params.repulsion_threshold;
-          this.vx += cos(angle) * force * 2;
-          this.vy += sin(angle) * force * 2;
-        }
-      };
-      
-      this.check_bounds = function() {
-        if (this.x < 0 || this.x > windowWidth) this.vx *= -0.5;
-        if (this.y < 0 || this.y > windowHeight) this.vy *= -0.5;
-      };
-      
-      this.update = function() {
-        this.x += this.vx;
-        this.y += this.vy;
-        this.vx *= 0.95;
-        this.vy *= 0.95;
-      };
-      
-      this.draw = function() {
-        fill(params.color);
-        noStroke();
-        ellipse(this.x, this.y, params.particle_size, params.particle_size);
       };
     }
     
@@ -704,12 +542,6 @@
         case 'scribble':
           drawScribble();
           break;
-        case 'particles_lines':
-          drawParticlesLines();
-          break;
-        case 'particles_attract_repel':
-          drawParticlesAttractRepel();
-          break;
         case 'light_rays':
           drawLightRays();
           break;
@@ -759,29 +591,6 @@
             scribble.scribbleRect(vec1.x, vec1.y, params.shape_size, params.shape_size);
           }
         }
-      }
-      pop();
-    }
-    
-    function drawParticlesLines() {
-      push();
-      translate(params.xoffset, params.yoffset);
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
-      pop();
-    }
-    
-    function drawParticlesAttractRepel() {
-      push();
-      translate(params.xoffset, params.yoffset);
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].attract();
-        particles[i].repulse(mouseX - params.xoffset, mouseY - params.yoffset);
-        particles[i].check_bounds();
-        particles[i].update();
-        particles[i].draw();
       }
       pop();
     }
