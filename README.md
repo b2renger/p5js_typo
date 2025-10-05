@@ -41,6 +41,22 @@ A repo to experiment (have fun) with typography using p5*js and Rune.font. All t
 ### tentacles
 ![tentacles image](assets/tentacles.png) [**Demo**](https://b2renger.github.io/p5js_typo/tentacles/index.html) - [**Code**](https://github.com/b2renger/p5js_typo)
 
+### A-Frame AR Demo
+An augmented reality version using A-Frame and AR.js with p5.js typography. This demo uses a barcode marker (value 0) to anchor animated 3D typography in augmented reality.
+
+[**Demo**](https://b2renger.github.io/p5js_typo/aframe.html) - [**Code**](https://github.com/b2renger/p5js_typo/blob/master/aframe.html)
+
+**Requirements:**
+- Device with camera access
+- Barcode marker with value 0 (can be generated from [AR.js Marker Generator](https://ar-js-org.github.io/AR.js/three.js/examples/marker-training/examples/generator.html))
+- HTTPS connection or localhost for camera permissions
+
+**Features:**
+- 3D animated typography anchored to barcode marker 0
+- Real-time rendering of p5.js sketch in AR space
+- Gradient-colored rotating spheres forming text
+- Based on the [Introduction to A-Frame with p5.js](https://github.com/b2renger/Introduction_A-frame#p5js-sketches) reference
+
 [**home**](#Contents)
 
 
