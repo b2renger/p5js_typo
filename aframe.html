@@ -193,7 +193,8 @@
         rotation="-90 0 0"
         width="2"
         height="2"
-        material="transparent: true; opacity: 1; side: double;">
+        material="shader: flat; transparent: true; opacity: 1; side: double;"
+        visible="true">
       </a-plane>
     </a-marker>
   </a-scene>
@@ -611,13 +612,21 @@
       
       background(0);
       
-      // Don't generate on page load - wait for user to click Generate button
+      // Auto-generate initial content so marker has something to show
+      setTimeout(() => {
+        generateTypography();
+      }, 1500);
     }
     
     function draw() {
-      if (!drawing) return;
-      
+      // Always update background even if not drawing yet
       background(params.background || [0, 0, 0]);
+      
+      if (!drawing) {
+        // Still update texture even when not drawing so plane is visible
+        updateTexture();
+        return;
+      }
       
       switch(currentExample) {
         case 'tentacles':
@@ -888,6 +897,17 @@
     
     // Initialize camera enumeration after scene is loaded
     window.addEventListener('load', function() {
+      // Add marker detection listeners for debugging
+      const marker = document.querySelector('a-marker');
+      if (marker) {
+        marker.addEventListener('markerFound', function() {
+          console.log('Marker detected!');
+        });
+        marker.addEventListener('markerLost', function() {
+          console.log('Marker lost!');
+        });
+      }
+      
       // Wait for AR.js to initialize
       setTimeout(async () => {
         // Request camera permission first
