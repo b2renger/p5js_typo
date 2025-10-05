@@ -189,24 +189,25 @@
       <!-- Test text to verify marker detection -->
       <a-text 
         value="MARKER DETECTED!" 
-        position="0 0.5 0" 
-        rotation="-90 0 0"
+        position="0 1 0" 
+        rotation="0 0 0"
         color="red" 
         align="center"
         width="3">
       </a-text>
       
       <!-- Container for p5.js rendered content -->
-      <a-plane 
-        id="p5-plane"
+      <a-box 
+        id="p5-box"
         position="0 0 0"
-        rotation="-90 0 0"
-        width="2"
-        height="2"
-        material="shader: flat; transparent: true; opacity: 1; side: double;"
+        rotation="0 0 0"
+        width="1"
+        height="1"
+        depth="1"
+        material="shader: flat;"
         p5-canvas
         visible="true">
-      </a-plane>
+      </a-box>
     </a-marker>
   </a-scene>
 
