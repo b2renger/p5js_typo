@@ -186,6 +186,16 @@
     
     <!-- Barcode Marker 0 -->
     <a-marker type="barcode" value="0">
+      <!-- Test text to verify marker detection -->
+      <a-text 
+        value="MARKER DETECTED!" 
+        position="0 0.5 0" 
+        rotation="-90 0 0"
+        color="red" 
+        align="center"
+        width="3">
+      </a-text>
+      
       <!-- Container for p5.js rendered content -->
       <a-plane 
         id="p5-plane"
@@ -194,10 +204,39 @@
         width="2"
         height="2"
         material="shader: flat; transparent: true; opacity: 1; side: double;"
+        p5-canvas
         visible="true">
       </a-plane>
     </a-marker>
   </a-scene>
+
+  <!-- Custom A-Frame component to link p5.js canvas to marker -->
+  <script>
+    AFRAME.registerComponent("p5-canvas", {
+      init() {
+        console.log('p5-canvas component init');
+        const self = this;
+        // Wait for p5 canvas to be ready
+        setTimeout(() => {
+          const canvas = document.getElementById('p5Canvas');
+          if (canvas) {
+            console.log('Setting canvas as material source');
+            self.el.setAttribute("material", {src: "#p5Canvas"});
+          } else {
+            console.error('p5Canvas not found');
+          }
+        }, 2000);
+      },
+      tick() {
+        const el = this.el;
+        const material = el.getObject3D("mesh")?.material;
+        if (!material || !material.map) {
+          return;
+        }
+        material.map.needsUpdate = true;
+      }
+    });
+  </script>
 
   <!-- p5.js sketch -->
   <script>
@@ -623,8 +662,7 @@
       background(params.background || [0, 0, 0]);
       
       if (!drawing) {
-        // Still update texture even when not drawing so plane is visible
-        updateTexture();
+        // A-Frame component handles texture updates
         return;
       }
       
@@ -646,8 +684,7 @@
           break;
       }
       
-      // Update the A-Frame plane texture
-      updateTexture();
+      // A-Frame component handles texture updates via tick()
     }
     
     function drawTentacles() {
@@ -751,32 +788,6 @@
       if (currentExample === 'light_rays' || currentExample === 'spot_lights') {
         anchorX = mouseX;
         anchorY = mouseY;
-      }
-    }
-    
-    // Update A-Frame plane with p5 canvas
-    function updateTexture() {
-      const plane = document.querySelector('#p5-plane');
-      if (plane && p5Canvas) {
-        const canvasEl = p5Canvas.elt;
-        
-        if (!plane.material) {
-          return;
-        }
-        
-        // Update material with canvas texture
-        if (!plane.material.map || plane.material.map.image !== canvasEl) {
-          const texture = new THREE.CanvasTexture(canvasEl);
-          texture.needsUpdate = true;
-          plane.setAttribute('material', {
-            src: canvasEl,
-            transparent: true,
-            opacity: 1,
-            side: THREE.DoubleSide
-          });
-        } else {
-          plane.material.map.needsUpdate = true;
-        }
       }
     }
     
