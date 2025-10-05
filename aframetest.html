@@ -80,14 +80,14 @@
     });
   </script>
 
-  <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false"
+<a-scene embedded
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best ; changeMatrixMode: modelViewMatrix;"
+    vr-mode-ui="enabled: false"
     renderer="sortObjects: true; antialias: true; colorManagement: true; physicallyCorrectLights; logarithmicDepthBuffer: true;"
-    arjs="trackingMethod: best"  detectionMode= 'color_and_matrix' changeMatrixMode= "modelViewMatrix" smooth="true"
-    smoothCount="5" smoothTolerance=".05" smoothThreshold="5" sourceWidth= "800"  sourceHeight= "600" displayWidth= "1280" displayHeight="720" shadow="autoUpdate: true; enabled: true; type:pcf"
-    light="defaultLightsEnabled: false">
+    smooth=" true" smoothCount="5" smoothTolerance=".05" smoothThreshold="5" sourceWidth="800" sourceHeight="600"
+    displayWidth="1280" displayHeight="720">
 
-
-    <a-marker preset="kanji" size: "0.8">
+    <a-marker type="barcode" value="0">
       <a-box width="1" height="1" position="0 0 0" material="shader: flat;" draw-canvas1>
       </a-box>
 
