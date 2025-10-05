@@ -1,5 +1,28 @@
 <!DOCTYPE html>
 <html>
+<!--
+  p5.js Typography AR Demo with A-Frame
+  ======================================
+  
+  This demo creates an augmented reality experience combining:
+  - A-Frame: Web VR/AR framework
+  - AR.js: Augmented reality for the web with marker tracking
+  - p5.js: Creative coding library for graphics
+  - Rune.js: Typography manipulation library
+  
+  How it works:
+  1. Uses device camera to detect barcode marker value 0
+  2. p5.js renders animated 3D typography to a canvas
+  3. Canvas is used as texture on A-Frame plane
+  4. Plane is anchored to the detected marker in AR space
+  
+  Requirements:
+  - Device with camera
+  - HTTPS or localhost for camera permissions
+  - Barcode marker value 0 (generate at: https://ar-js-org.github.io/AR.js/three.js/examples/marker-training/examples/generator.html)
+  
+  Based on: https://github.com/b2renger/Introduction_A-frame#p5js-sketches
+-->
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
