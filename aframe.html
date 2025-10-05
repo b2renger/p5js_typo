@@ -39,6 +39,9 @@
   <!-- p5.js library -->
   <script src="libraries/p5.js"></script>
   
+  <!-- p5.scribble library for scribble effects -->
+  <script src="libraries/p5.scribble.js"></script>
+  
   <!-- Rune.js libraries for typography -->
   <script src="libraries/rune.js"></script>
   <script src="libraries/rune.font.js"></script>
@@ -49,18 +52,66 @@
       overflow: hidden;
     }
     
-    .info {
+    .controls {
       position: fixed;
       top: 10px;
       left: 10px;
-      background: rgba(0, 0, 0, 0.7);
+      background: rgba(0, 0, 0, 0.9);
       color: white;
-      padding: 10px;
+      padding: 15px;
       font-family: Arial, sans-serif;
       font-size: 12px;
-      border-radius: 5px;
+      border-radius: 8px;
       z-index: 1000;
       max-width: 250px;
+    }
+    
+    .controls h2 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #ed225d;
+    }
+    
+    .control-group {
+      margin-bottom: 10px;
+    }
+    
+    .control-group button {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #ed225d;
+      color: #fff;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    
+    .control-group button:hover {
+      background: #c71d4f;
+    }
+    
+    @media (max-width: 768px) {
+      .controls {
+        top: 5px;
+        left: 5px;
+        right: 5px;
+        padding: 10px;
+        max-width: auto;
+      }
+      
+      .controls h2 {
+        font-size: 14px;
+        margin-bottom: 8px;
+      }
+      
+      .control-group button {
+        padding: 6px;
+        font-size: 12px;
+      }
     }
     
     #p5Canvas {
@@ -69,10 +120,12 @@
   </style>
 </head>
 <body>
-  <!-- Info overlay -->
-  <div class="info">
-    <strong>p5.js Typography AR</strong><br>
-    Point camera at barcode marker 0
+  <!-- Controls overlay -->
+  <div class="controls">
+    <h2>AR Typography</h2>
+    <div class="control-group">
+      <button id="generateBtn">Generate</button>
+    </div>
   </div>
 
   <!-- A-Frame Scene -->
@@ -106,118 +159,549 @@
 
   <!-- p5.js sketch -->
   <script>
-    // p5.js variables
+    // Available fonts
+    const fonts = [
+      "fonts/AvenirNextLTW01-Medium.woff",
+      "fonts/Black_Ops_One/BlackOpsOne-Regular.ttf",
+      "fonts/Comfortaa/Comfortaa-Bold.ttf",
+      "fonts/Nova_Mono/NovaMono.ttf",
+      "fonts/Shadows_Into_Light/ShadowsIntoLight.ttf",
+      "fonts/Sniglet/Sniglet-ExtraBold.ttf",
+      "fonts/Tangerine/Tangerine_Bold.ttf",
+      "fonts/Unica_One/UnicaOne-Regular.ttf"
+    ];
+
+    // Global variables
     let f;
     let path;
     let polys;
     let drawing = false;
-    let shapes = [];
-    let params;
-    let animationOffset = 0;
+    let currentExample = 'tentacles';
+    let currentFont;
+    let currentColor;
+    let params = {};
+    let p5Font;
     let p5Canvas;
     
-    // Typography configuration
-    const config = {
-      font: "fonts/AvenirNextLTW01-Medium.woff",
-      message: 'AR',
-      spacing: 15,
-      size: 200,
-      shape_size: 12,
-      shape_type: 4, // sphere
-      animation_speed: 0.02
-    };
+    // Tentacles specific
+    let tentacles = [];
+    let anchorX, anchorY;
     
-    // Load font and generate typography points
-    function getPoints() {
-      drawing = false;
-      f = new Rune.Font(config.font);
+    // Scribble specific
+    let scribble;
+    let seed;
+    
+    // 3D specific
+    let shapes = [];
+    
+    // Random color generator
+    function randomColor() {
+      return [random(150, 255), random(150, 255), random(150, 255)];
+    }
+    
+    function randomBrightColor() {
+      const hue = random(360);
+      colorMode(HSB, 360, 100, 100);
+      const c = color(hue, random(70, 100), random(80, 100));
+      colorMode(RGB, 255);
+      return [red(c), green(c), blue(c)];
+    }
+    
+    function ensureContrast(bgColor, fgColor) {
+      const getLuminance = (rgb) => {
+        const [r, g, b] = rgb;
+        return 0.299 * r + 0.587 * g + 0.114 * b;
+      };
       
-      f.load(function(err) {
-        if (err) {
-          console.error("Font loading error:", err);
-          return;
+      const bgLum = getLuminance(bgColor);
+      const fgLum = getLuminance(fgColor);
+      
+      if (Math.abs(bgLum - fgLum) < 100) {
+        if (bgLum < 128) {
+          return [random(200, 255), random(200, 255), random(200, 255)];
+        } else {
+          return [random(50, 100), random(50, 100), random(50, 100)];
         }
+      }
+      return fgColor;
+    }
+    
+    function randomFont() {
+      return fonts[Math.floor(Math.random() * fonts.length)];
+    }
+    
+    function randomPreset(presets) {
+      return presets[Math.floor(Math.random() * presets.length)];
+    }
+    
+    function getTentaclesPreset() {
+      const bg = [0, 0, 0];
+      const fg = ensureContrast(bg, randomBrightColor());
+      const presets = [
+        {
+          background: bg,
+          color: fg,
+          spacing: 2,
+          tnoiseMultiplicator: 5,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        {
+          background: [0, 0, 0, 15],
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([15]),
+          spacing: 5,
+          tnoiseMultiplicator: 10,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        {
+          background: [0, 0, 0, 0],
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([20]),
+          spacing: 8,
+          tnoiseMultiplicator: 5,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        },
+        {
+          background: [0, 0, 0, 0],
+          color: ensureContrast([0, 0, 0], randomBrightColor()).concat([30]),
+          spacing: 20,
+          tnoiseMultiplicator: 45,
+          tminRandom: 5,
+          tmaxRandom: 10,
+          tdimStep: 0.07
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getScribblePreset() {
+      const bg = [0, 0, 0];
+      const fg = ensureContrast(bg, randomBrightColor());
+      const presets = [
+        {
+          spacing: 50,
+          bowing: 1,
+          roughness: 5,
+          maxOffset: 1.2,
+          stroke_weight: 1,
+          shape_size: 0,
+          shape: 0,
+          color: fg.concat([150])
+        },
+        {
+          spacing: 10,
+          bowing: 313,
+          roughness: 1,
+          maxOffset: 3.2,
+          stroke_weight: 3,
+          shape_size: 50,
+          shape: 0,
+          color: ensureContrast(bg, randomBrightColor()).concat([150])
+        },
+        {
+          spacing: 10,
+          bowing: 1,
+          roughness: 26,
+          maxOffset: 1,
+          stroke_weight: 0.5,
+          shape_size: 50,
+          shape: 0,
+          color: ensureContrast(bg, randomBrightColor()).concat([150])
+        },
+        {
+          spacing: 5,
+          bowing: 1,
+          roughness: 1,
+          maxOffset: 1,
+          stroke_weight: 10,
+          shape_size: 100,
+          shape: 2,
+          color: ensureContrast(bg, randomBrightColor()).concat([2])
+        }
+      ];
+      return randomPreset(presets);
+    }
+    
+    function getLightRaysPreset() {
+      const bg = [random(0, 50), random(0, 50), random(0, 50)];
+      return {
+        spacing: random(5, 20),
+        background: bg,
+        color: ensureContrast(bg, randomBrightColor()),
+        stroke_weight: random(0.1, 5)
+      };
+    }
+    
+    function getSpotLightsPreset() {
+      const bg = [random(200, 255), random(200, 255), random(200, 255)];
+      return {
+        spacing: random(5, 20),
+        background: bg,
+        color: ensureContrast(bg, randomBrightColor()),
+        stroke_weight: random(0.1, 5)
+      };
+    }
+    
+    function get3DPreset() {
+      const bg = [random(0, 50), random(0, 50), random(0, 50)];
+      return {
+        spacing: random(10, 30),
+        background: bg,
+        shape_size: random(15, 35),
+        shape_type: floor(random(0, 7)),
+        alignement_x: 0,
+        alignement_y: 0,
+        animation: 0,
+        animation_speed: 0.025
+      };
+    }
+    
+    // Generate typography with random example
+    function generateTypography() {
+      drawing = false;
+      
+      // Randomly select example
+      const examples = ['tentacles', 'scribble', 'light_rays', 'spot_lights', '3d'];
+      currentExample = examples[Math.floor(Math.random() * examples.length)];
+      
+      currentFont = randomFont();
+      
+      // Get preset based on current example
+      switch(currentExample) {
+        case 'tentacles':
+          params = getTentaclesPreset();
+          break;
+        case 'scribble':
+          params = getScribblePreset();
+          seed = random(1000);
+          break;
+        case 'light_rays':
+          params = getLightRaysPreset();
+          break;
+        case 'spot_lights':
+          params = getSpotLightsPreset();
+          break;
+        case '3d':
+          params = get3DPreset();
+          break;
+      }
+      
+      params.message = 'ateliernum';
+      params.size = 200; // Fixed size for AR
+      params.font = currentFont;
+      
+      // Load font for bounds calculation
+      loadFont(currentFont, function(font) {
+        p5Font = font;
         
-        path = f.toPath(config.message, 0, 0, config.size);
-        polys = path.toPolygons({ spacing: config.spacing });
+        if (currentExample !== '3d') {
+          textFont(p5Font);
+          textSize(params.size);
+        }
+        const bounds = p5Font.textBounds(params.message, 0, 0, params.size);
         
-        shapes = [];
+        params.xoffset = -bounds.x - bounds.w / 2;
+        params.yoffset = -bounds.y - bounds.h / 2;
         
-        for (let i = 0; i < polys.length; i++) {
-          const poly = polys[i];
-          for (let j = 0; j < poly.state.vectors.length; j++) {
-            const vec = poly.state.vectors[j];
-            shapes.push({
-              x: vec.x,
-              y: vec.y,
-              z: 0,
-              index: i * poly.state.vectors.length + j
-            });
+        // Load Rune font for polygons
+        f = new Rune.Font(currentFont);
+        f.load(function(err) {
+          if (err) {
+            console.error('Error loading font:', err);
+            return;
           }
-        }
-        
-        drawing = true;
-        console.log("Typography loaded with " + shapes.length + " shapes");
+          
+          path = f.toPath(params.message, 0, 0, params.size);
+          polys = path.toPolygons({ spacing: params.spacing });
+          
+          // Initialize example-specific data
+          switch(currentExample) {
+            case 'tentacles':
+              background(params.background || [0, 0, 0]);
+              initTentacles();
+              break;
+            case 'scribble':
+              break;
+            case 'light_rays':
+              break;
+            case 'spot_lights':
+              break;
+            case '3d':
+              init3D();
+              break;
+          }
+          
+          drawing = true;
+          console.log('Typography loaded:', currentExample);
+        });
       });
     }
     
+    // Initialize tentacles
+    function initTentacles() {
+      tentacles = [];
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          tentacles.push(new Tentacle(
+            vec.x, vec.y,
+            params.tnoiseMultiplicator,
+            params.tminRandom,
+            params.tmaxRandom,
+            params.tdimStep
+          ));
+        }
+      }
+    }
+    
+    // Tentacle class
+    function Tentacle(x, y, noiseM, minRand, maxRand, dimStep) {
+      this.x = x;
+      this.y = y;
+      this.minRandom = minRand;
+      this.maxRandom = maxRand;
+      this.dimStep = dimStep;
+      this.size = random(this.minRandom, this.maxRandom);
+      this.angle = random(360);
+      this.radius = 0;
+      this.noiseFactor = random(500);
+      this.noiseMultiplicator = noiseM;
+      
+      this.draw = function() {
+        this.radius += 1;
+        this.angle = this.angle + noise(this.noiseFactor, 10) * this.noiseMultiplicator - this.noiseMultiplicator / 2;
+        this.size -= this.dimStep;
+        this.noiseFactor += 0.005;
+        
+        fill(params.color);
+        noStroke();
+        let drawX = this.x + this.radius * cos(radians(this.angle));
+        let drawY = this.y + this.radius * sin(radians(this.angle));
+        ellipse(drawX, drawY, this.size, this.size);
+        
+        if (this.size < 0) {
+          this.angle = random(360);
+          this.radius = 0;
+          this.noiseFactor = random(500);
+          this.size = random(this.minRandom, this.maxRandom);
+        }
+      };
+    }
+    
+    // Initialize 3D shapes
+    function init3D() {
+      shapes = [];
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          shapes.push(new Shape3D(vec.x, vec.y, 0));
+        }
+      }
+    }
+    
+    // Shape3D class
+    function Shape3D(x, y, z) {
+      this.x = x;
+      this.y = y;
+      this.z = z;
+      this.anchorx = x;
+      this.anchory = y;
+      this.anchorz = z;
+      this.oriX = 0;
+      this.oriY = 0;
+      
+      this.update = function() {
+        if (params.animation === 0) {
+          this.x = lerp(this.x, this.anchorx, params.animation_speed);
+          this.y = lerp(this.y, this.anchory, params.animation_speed);
+          this.z = lerp(this.z, this.anchorz, params.animation_speed);
+        } else {
+          this.x = lerp(this.x, random(-200, 200), params.animation_speed);
+          this.y = lerp(this.y, random(-200, 200), params.animation_speed);
+          this.z = lerp(this.z, random(-200, 200), params.animation_speed);
+        }
+      };
+      
+      this.display = function() {
+        push();
+        translate(this.x, this.y, this.z);
+        rotateY(map(this.oriX, 0, 512, -PI, PI));
+        rotateX(map(this.oriY, 0, 512, -PI, PI));
+        this.drawShape();
+        pop();
+      };
+      
+      this.drag = function(x, y) {
+        this.oriX = x;
+        this.oriY = y;
+      };
+      
+      this.drawShape = function() {
+        switch(params.shape_type) {
+          case 0: cone(params.shape_size, params.shape_size); break;
+          case 1: ellipsoid(params.shape_size, params.shape_size, params.shape_size); break;
+          case 2: torus(params.shape_size, params.shape_size / 3); break;
+          case 3: cylinder(params.shape_size, params.shape_size); break;
+          case 4: sphere(params.shape_size); break;
+          case 5: box(params.shape_size); break;
+          case 6: plane(params.shape_size, params.shape_size); break;
+        }
+      };
+    }
+    
     function setup() {
-      // Create p5 canvas
-      p5Canvas = createCanvas(512, 512, WEBGL);
+      // Create canvas for AR texture
+      if (currentExample === '3d') {
+        p5Canvas = createCanvas(512, 512, WEBGL);
+      } else {
+        p5Canvas = createCanvas(512, 512);
+      }
       p5Canvas.id('p5Canvas');
       
-      // Load typography
-      getPoints();
+      scribble = new Scribble();
+      anchorX = 256;
+      anchorY = 256;
+      
+      background(0);
+      
+      // Don't generate on page load - wait for user to click Generate button
     }
     
     function draw() {
-      // Clear with transparent background
-      background(0, 0, 0, 0);
+      if (!drawing) return;
       
-      if (!drawing || shapes.length === 0) {
-        return;
+      background(params.background || [0, 0, 0]);
+      
+      switch(currentExample) {
+        case 'tentacles':
+          drawTentacles();
+          break;
+        case 'scribble':
+          drawScribble();
+          break;
+        case 'light_rays':
+          drawLightRays();
+          break;
+        case 'spot_lights':
+          drawSpotLights();
+          break;
+        case '3d':
+          draw3D();
+          break;
       }
-      
-      // Setup lighting
-      ambientLight(50);
-      directionalLight(200, 0, 100, 0.5, 0.5, 0.5);
-      pointLight(200, 100, 150, 0, 0, 100);
-      
-      // Center and scale the typography
-      push();
-      translate(-config.size / 2, -config.size / 2, 0);
-      
-      // Render all shapes
-      for (let i = 0; i < shapes.length; i++) {
-        const shape = shapes[i];
-        
-        push();
-        translate(shape.x, shape.y, shape.z);
-        
-        // Animated rotation
-        const phaseOffset = shape.index * 0.1;
-        rotateY(animationOffset + phaseOffset);
-        rotateX(animationOffset * 0.5 + phaseOffset);
-        
-        // Set color with gradient based on position
-        const hue = (shape.index / shapes.length) * 360;
-        const col = color('hsl(' + hue + ', 80%, 60%)');
-        fill(col);
-        noStroke();
-        
-        // Draw shape (sphere)
-        sphere(config.shape_size);
-        
-        pop();
-      }
-      
-      pop();
-      
-      // Update animation
-      animationOffset += config.animation_speed;
       
       // Update the A-Frame plane texture
       updateTexture();
+    }
+    
+    function drawTentacles() {
+      push();
+      translate(params.xoffset + 256, params.yoffset + 256);
+      for (let i = 0; i < tentacles.length; i++) {
+        tentacles[i].draw();
+      }
+      pop();
+    }
+    
+    function drawScribble() {
+      scribble.bowing = params.bowing;
+      scribble.roughness = params.roughness;
+      scribble.maxOffset = params.maxOffset;
+      randomSeed(seed);
+      
+      push();
+      translate(params.xoffset + 256, params.yoffset + 256);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 1; j < poly.state.vectors.length; j++) {
+          let vec1 = poly.state.vectors[j];
+          let vec2 = poly.state.vectors[j - 1];
+          noFill();
+          stroke(params.color);
+          strokeWeight(params.stroke_weight);
+          
+          if (params.shape === 0) {
+            scribble.scribbleLine(vec1.x, vec1.y, vec2.x, vec2.y);
+          } else if (params.shape === 1) {
+            scribble.scribbleEllipse(vec1.x, vec1.y, params.shape_size, params.shape_size);
+          } else if (params.shape === 2) {
+            scribble.scribbleRect(vec1.x, vec1.y, params.shape_size, params.shape_size);
+          }
+        }
+      }
+      pop();
+    }
+    
+    function drawLightRays() {
+      push();
+      translate(params.xoffset + 256, params.yoffset + 256);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          line(anchorX - params.xoffset - 256, anchorY - params.yoffset - 256, vec.x, vec.y);
+        }
+      }
+      pop();
+    }
+    
+    function drawSpotLights() {
+      push();
+      translate(params.xoffset + 256, params.yoffset + 256);
+      strokeWeight(params.stroke_weight);
+      stroke(params.color);
+      
+      for (let i = 0; i < polys.length; i++) {
+        let poly = polys[i];
+        for (let j = 0; j < poly.state.vectors.length; j++) {
+          let vec = poly.state.vectors[j];
+          let angle = atan2(vec.y - (anchorY - params.yoffset - 256), vec.x - (anchorX - params.xoffset - 256));
+          let len = random(50, 150);
+          let endX = vec.x + cos(angle) * len;
+          let endY = vec.y + sin(angle) * len;
+          line(vec.x, vec.y, endX, endY);
+        }
+      }
+      pop();
+    }
+    
+    function draw3D() {
+      ambientLight(50);
+      directionalLight(255, 255, 255, 0.55, 0.25, 0.25);
+      directionalLight(255, 255, 255, -0.55, -0.25, -0.25);
+      directionalLight(255, 255, 255, 0, 0.5, -0.3);
+      pointLight(255, 255, 255, 0, 0, 200);
+      
+      push();
+      translate(params.alignement_x, params.alignement_y, 0);
+      
+      for (let i = 0; i < shapes.length; i++) {
+        shapes[i].update();
+        shapes[i].drag(256, 256);
+        const brightCol = randomBrightColor();
+        fill(brightCol[0], brightCol[1], brightCol[2]);
+        shapes[i].display();
+      }
+      pop();
+    }
+    
+    function mouseDragged() {
+      if (currentExample === 'light_rays' || currentExample === 'spot_lights') {
+        anchorX = mouseX;
+        anchorY = mouseY;
+      }
     }
     
     // Update A-Frame plane with p5 canvas
@@ -246,10 +730,26 @@
       }
     }
     
-    // Handle window resize
-    function windowResized() {
-      // Keep canvas size constant for AR
-    }
+    // Event listeners
+    document.getElementById('generateBtn').addEventListener('click', function() {
+      // Recreate canvas with correct renderer based on random example
+      const examples = ['tentacles', 'scribble', 'light_rays', 'spot_lights', '3d'];
+      const nextExample = examples[Math.floor(Math.random() * examples.length)];
+      
+      if (nextExample === '3d' && currentExample !== '3d') {
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+        p5Canvas = createCanvas(512, 512, WEBGL);
+        p5Canvas.id('p5Canvas');
+      } else if (nextExample !== '3d' && currentExample === '3d') {
+        const canvas = document.querySelector('canvas');
+        if (canvas) canvas.remove();
+        p5Canvas = createCanvas(512, 512);
+        p5Canvas.id('p5Canvas');
+      }
+      
+      generateTypography();
+    });
   </script>
 </body>
 </html>
