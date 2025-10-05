@@ -50,6 +50,23 @@
     body {
       margin: 0;
       overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+    
+    html {
+      width: 100%;
+      height: 100%;
+    }
+    
+    a-scene {
+      width: 100% !important;
+      height: 100% !important;
+    }
+    
+    .a-canvas {
+      width: 100% !important;
+      height: 100% !important;
     }
     
     .controls {
@@ -784,43 +801,82 @@
     
     // Switch camera
     async function switchCamera(deviceId) {
+      console.log('Switching to camera:', deviceId || 'default');
+      
       const scene = document.querySelector('a-scene');
-      if (!scene) return;
+      if (!scene) {
+        console.error('Scene not found');
+        return;
+      }
       
       currentCameraId = deviceId;
       
-      // Update AR.js with new camera
+      // Wait for AR.js to be ready
+      if (!scene.systems || !scene.systems.arjs) {
+        console.error('AR.js system not ready');
+        return;
+      }
+      
       const arjsSystem = scene.systems.arjs;
-      if (arjsSystem && arjsSystem.videoElement) {
-        try {
-          // Stop current stream
-          const stream = arjsSystem.videoElement.srcObject;
-          if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-          }
-          
-          // Get new stream with selected camera
-          const constraints = {
-            video: {
-              width: { ideal: 1280 },
-              height: { ideal: 960 },
-              facingMode: deviceId ? undefined : 'environment'
-            }
-          };
-          
-          if (deviceId) {
-            constraints.video.deviceId = { exact: deviceId };
-          }
-          
-          const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-          arjsSystem.videoElement.srcObject = newStream;
-          await arjsSystem.videoElement.play();
-          
-          console.log('Camera switched successfully');
-        } catch (error) {
-          console.error('Error switching camera:', error);
-          alert('Failed to switch camera. Please try another camera or refresh the page.');
+      
+      // Get the video element
+      let videoElement = arjsSystem.videoElement;
+      
+      if (!videoElement) {
+        // Try to find it in different ways
+        videoElement = document.querySelector('video');
+        if (!videoElement) {
+          console.error('Video element not found');
+          return;
         }
+      }
+      
+      try {
+        // Stop current stream
+        const currentStream = videoElement.srcObject;
+        if (currentStream) {
+          currentStream.getTracks().forEach(track => {
+            track.stop();
+            console.log('Stopped track:', track.label);
+          });
+        }
+        
+        // Prepare constraints for new stream
+        const constraints = {
+          audio: false,
+          video: {
+            width: { ideal: 1280 },
+            height: { ideal: 960 }
+          }
+        };
+        
+        // Set device ID or facing mode
+        if (deviceId) {
+          constraints.video.deviceId = { exact: deviceId };
+        } else {
+          constraints.video.facingMode = 'environment';
+        }
+        
+        console.log('Requesting camera with constraints:', constraints);
+        
+        // Get new stream
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        console.log('Got new stream:', newStream.id);
+        
+        // Apply new stream to video element
+        videoElement.srcObject = newStream;
+        
+        // Play the video
+        try {
+          await videoElement.play();
+          console.log('Camera switched and playing successfully');
+        } catch (playError) {
+          console.error('Error playing video:', playError);
+        }
+        
+      } catch (error) {
+        console.error('Error switching camera:', error);
+        alert(`Failed to switch camera: ${error.message}`);
       }
     }
     
