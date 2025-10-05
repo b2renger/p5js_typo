@@ -77,6 +77,23 @@
       margin-bottom: 10px;
     }
     
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    
+    .control-group select {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      background: #333;
+      color: #fff;
+      cursor: pointer;
+    }
+    
     .control-group button {
       width: 100%;
       padding: 8px;
@@ -108,7 +125,8 @@
         margin-bottom: 8px;
       }
       
-      .control-group button {
+      .control-group button,
+      .control-group select {
         padding: 6px;
         font-size: 12px;
       }
@@ -124,6 +142,12 @@
   <div class="controls">
     <h2>AR Typography</h2>
     <div class="control-group">
+      <label for="cameraSelect">Camera:</label>
+      <select id="cameraSelect">
+        <option value="">Default Camera</option>
+      </select>
+    </div>
+    <div class="control-group">
       <button id="generateBtn">Generate</button>
     </div>
   </div>
@@ -131,7 +155,7 @@
   <!-- A-Frame Scene -->
   <a-scene
     embedded
-    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;"
+    arjs="sourceType: webcam; debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3; sourceWidth: 1280; sourceHeight: 960; displayWidth: 1280; displayHeight: 960; videoTexture: true;"
     vr-mode-ui="enabled: false"
     renderer="logarithmicDepthBuffer: true; precision: medium;">
     
@@ -140,8 +164,8 @@
       <a-asset-item id="p5-texture" src=""></a-asset-item>
     </a-assets>
     
-    <!-- Camera -->
-    <a-entity camera></a-entity>
+    <!-- Camera with proper FOV to prevent zoom -->
+    <a-entity camera look-controls="enabled: false" fov="80"></a-entity>
     
     <!-- Barcode Marker 0 -->
     <a-marker type="barcode" value="0">
@@ -731,6 +755,96 @@
     }
     
     // Event listeners
+    
+    // Camera enumeration and selection
+    let availableCameras = [];
+    let currentCameraId = null;
+    
+    // Enumerate available cameras
+    async function enumerateCameras() {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        availableCameras = devices.filter(device => device.kind === 'videoinput');
+        
+        const cameraSelect = document.getElementById('cameraSelect');
+        cameraSelect.innerHTML = '<option value="">Default Camera</option>';
+        
+        availableCameras.forEach((device, index) => {
+          const option = document.createElement('option');
+          option.value = device.deviceId;
+          option.text = device.label || `Camera ${index + 1}`;
+          cameraSelect.appendChild(option);
+        });
+        
+        console.log(`Found ${availableCameras.length} cameras`);
+      } catch (error) {
+        console.error('Error enumerating cameras:', error);
+      }
+    }
+    
+    // Switch camera
+    async function switchCamera(deviceId) {
+      const scene = document.querySelector('a-scene');
+      if (!scene) return;
+      
+      currentCameraId = deviceId;
+      
+      // Update AR.js with new camera
+      const arjsSystem = scene.systems.arjs;
+      if (arjsSystem && arjsSystem.videoElement) {
+        try {
+          // Stop current stream
+          const stream = arjsSystem.videoElement.srcObject;
+          if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+          }
+          
+          // Get new stream with selected camera
+          const constraints = {
+            video: {
+              width: { ideal: 1280 },
+              height: { ideal: 960 },
+              facingMode: deviceId ? undefined : 'environment'
+            }
+          };
+          
+          if (deviceId) {
+            constraints.video.deviceId = { exact: deviceId };
+          }
+          
+          const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+          arjsSystem.videoElement.srcObject = newStream;
+          await arjsSystem.videoElement.play();
+          
+          console.log('Camera switched successfully');
+        } catch (error) {
+          console.error('Error switching camera:', error);
+          alert('Failed to switch camera. Please try another camera or refresh the page.');
+        }
+      }
+    }
+    
+    // Camera select event listener
+    document.getElementById('cameraSelect').addEventListener('change', function(e) {
+      const deviceId = e.target.value;
+      switchCamera(deviceId);
+    });
+    
+    // Initialize camera enumeration after scene is loaded
+    window.addEventListener('load', function() {
+      // Wait for AR.js to initialize
+      setTimeout(async () => {
+        // Request camera permission first
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+          stream.getTracks().forEach(track => track.stop());
+          await enumerateCameras();
+        } catch (error) {
+          console.error('Camera permission error:', error);
+        }
+      }, 1000);
+    });
+    
     document.getElementById('generateBtn').addEventListener('click', function() {
       // Recreate canvas with correct renderer based on random example
       const examples = ['tentacles', 'scribble', 'light_rays', 'spot_lights', '3d'];
