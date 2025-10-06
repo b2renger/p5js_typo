@@ -377,7 +377,7 @@ function Segment( _x1, _y1, _x2, _y2 ) {
         return Relation.SEPARATE;
       }
 
-      if ((x1 >= Math.min(otherSegment.getPx1(),otherSegment.getPx2())) &&
+      if ((x1 >= Math.min(otherSegment.getPx1(),otherSegment.getPy2())) &&
         (x1 <= Math.max(otherSegment.getPy1(),otherSegment.getPy2()))) {
         xi = x1;
         yi = y1;

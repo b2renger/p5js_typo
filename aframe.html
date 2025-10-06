@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>p5.js Typography AR - A-Frame</title>
+  
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.0/aframe/build/aframe-ar.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
+  <script src="libraries/rune.js"></script>
+  <script src="libraries/rune.font.js"></script>
+  <script src="libraries/p5.scribble-instance.js"></script>
+  
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+    
+    .controls {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.9);
+      color: white;
+      padding: 15px;
+      font-family: Arial, sans-serif;
+      font-size: 12px;
+      border-radius: 8px;
+      z-index: 9999;
+      pointer-events: auto;
+    }
+    
+    .controls h2 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: #ed225d;
+    }
+
+    .control-group {
+      margin-bottom: 10px;
+    }
+    
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 12px;
+    }
+    
+    .control-group select,
+    .control-group button {
+      width: 100%;
+      padding: 8px;
+      font-size: 13px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .control-group select {
+      background: #333;
+      color: #fff;
+    }
+    
+    .controls button {
+      background: #ed225d;
+      color: #fff;
+      font-weight: bold;
+    }
+    
+    .controls button:hover {
+      background: #c71d4f;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls">
+    <h2>AR Typography</h2>
+    <div class="control-group">
+      <label for="exampleSelect">Select Example:</label>
+      <select id="exampleSelect">
+        <option value="tentacles">Tentacles</option>
+        <option value="scribble">Scribble</option>
+        <option value="light_rays">Light Rays</option>
+        <option value="spot_lights">Spot Lights</option>
+      </select>
+    </div>
+    <div class="control-group">
+      <button id="generateBtn">Generate</button>
+    </div>
+  </div>
+
+  <div id="p5container"></div>
+
+  <script>
+    let sketch = function(p) {
+      // Available fonts
+      const fonts = [
+        "fonts/AvenirNextLTW01-Medium.woff",
+        "fonts/Black_Ops_One/BlackOpsOne-Regular.ttf",
+        "fonts/Comfortaa/Comfortaa-Bold.ttf",
+        "fonts/Nova_Mono/NovaMono.ttf",
+        "fonts/Shadows_Into_Light/ShadowsIntoLight.ttf",
+        "fonts/Sniglet/Sniglet-ExtraBold.ttf",
+        "fonts/Tangerine/Tangerine_Bold.ttf",
+        "fonts/Unica_One/UnicaOne-Regular.ttf"
+      ];
+
+      // Global variables
+      let f;
+      let path;
+      let polys;
+      let drawing = false;
+      let currentExample = 'tentacles';
+      let currentFont;
+      let currentColor;
+      let params = {};
+      let p5Font; // Store the loaded p5.js font
+      
+      // Tentacles specific
+      let tentacles = [];
+      let anchorX, anchorY;
+      
+      // Scribble specific
+      let scribble;
+      let seed;
+      
+      // Random color generator (uses p5.js random) - ensures good contrast
+      function randomColor() {
+        return [p.random(150, 255), p.random(150, 255), p.random(150, 255)];
+      }
+      
+      // Random color with high saturation for better visibility
+      function randomBrightColor() {
+        const hue = p.random(360);
+        // Convert HSB to RGB for bright, saturated colors
+        p.colorMode(p.HSB, 360, 100, 100);
+        const c = p.color(hue, p.random(70, 100), p.random(80, 100));
+        p.colorMode(p.RGB, 255);
+        return [p.red(c), p.green(c), p.blue(c)];
+      }
+      
+      // Ensure contrast between background and foreground
+      function ensureContrast(bgColor, fgColor) {
+        // Calculate luminance
+        const getLuminance = (rgb) => {
+          const [r, g, b] = rgb;
+          return 0.299 * r + 0.587 * g + 0.114 * b;
+        };
+        
+        const bgLum = getLuminance(bgColor);
+        const fgLum = getLuminance(fgColor);
+        
+        // If contrast is too low, adjust foreground color
+        if (Math.abs(bgLum - fgLum) < 100) {
+          if (bgLum < 128) {
+            // Dark background, make foreground bright
+            return [p.random(200, 255), p.random(200, 255), p.random(200, 255)];
+          } else {
+            // Light background, make foreground dark
+            return [p.random(50, 100), p.random(50, 100), p.random(50, 100)];
+          }
+        }
+        return fgColor;
+      }
+      
+      // Random font selector (uses native Math.random)
+      function randomFont() {
+        return fonts[Math.floor(Math.random() * fonts.length)];
+      }
+      
+      // Random array element selector (uses p5.js random)
+      function randomPreset(presets) {
+        return presets[Math.floor(p.random(presets.length))];
+      }
+      
+      // Get random preset config for each example
+      function getTentaclesPreset() {
+        const bg = [0, 0, 0];
+        const fg = ensureContrast(bg, randomBrightColor());
+        const presets = [
+          { // dispertion_effect - optimized spacing from 0.75 to 2
+            background: bg,
+            color: fg,
+            spacing: 2,
+            tnoiseMultiplicator: 5,
+            tminRandom: 5,
+            tmaxRandom: 10,
+            tdimStep: 0.07
+          },
+          { // fireworks_effect - optimized spacing from 3 to 5
+            background: [0, 0, 0, 15],
+            color: ensureContrast([0, 0, 0], randomBrightColor()).concat([15]),
+            spacing: 5,
+            tnoiseMultiplicator: 10,
+            tminRandom: 5,
+            tmaxRandom: 10,
+            tdimStep: 0.07
+          },
+          { // spiky_effect - optimized spacing from 5 to 8
+            background: [0, 0, 0, 0],
+            color: ensureContrast([0, 0, 0], randomBrightColor()).concat([20]),
+            spacing: 8,
+            tnoiseMultiplicator: 5,
+            tminRandom: 5,
+            tmaxRandom: 10,
+            tdimStep: 0.07
+          },
+          { // curly_effect - kept at 20
+            background: [0, 0, 0, 0],
+            color: ensureContrast([0, 0, 0], randomBrightColor()).concat([30]),
+            spacing: 20,
+            tnoiseMultiplicator: 45,
+            tminRandom: 5,
+            tmaxRandom: 10,
+            tdimStep: 0.07
+          }
+        ];
+        return randomPreset(presets);
+      }
+      
+      function getScribblePreset() {
+        const bg = [0, 0, 0];
+        const fg = ensureContrast(bg, randomBrightColor());
+        const presets = [
+          { // optimized spacing from 100 to 50
+            spacing: 50,
+            bowing: 1,
+            roughness: 5,
+            maxOffset: 1.2,
+            stroke_weight: 1,
+            shape_size: 0,
+            shape: 0,
+            color: fg.concat([150])
+          },
+          { // optimized spacing from 6 to 10
+            spacing: 10,
+            bowing: 313,
+            roughness: 1,
+            maxOffset: 3.2,
+            stroke_weight: 3,
+            shape_size: 50,
+            shape: 0,
+            color: ensureContrast(bg, randomBrightColor()).concat([150])
+          },
+          { // optimized spacing from 6 to 10
+            spacing: 10,
+            bowing: 1,
+            roughness: 26,
+            maxOffset: 1,
+            stroke_weight: 0.5,
+            shape_size: 50,
+            shape: 0,
+            color: ensureContrast(bg, randomBrightColor()).concat([150])
+          },
+          { // optimized spacing from 2 to 5
+            spacing: 5,
+            bowing: 1,
+            roughness: 1,
+            maxOffset: 1,
+            stroke_weight: 10,
+            shape_size: 100,
+            shape: 2,
+            color: ensureContrast(bg, randomBrightColor()).concat([2])
+          }
+        ];
+        return randomPreset(presets);
+      }
+      
+      function getLightRaysPreset() {
+        const bg = [p.random(0, 50), p.random(0, 50), p.random(0, 50)];
+        return {
+          spacing: p.random(5, 20), // optimized from 1-25 to 5-20
+          background: bg,
+          color: ensureContrast(bg, randomBrightColor()),
+          stroke_weight: p.random(0.1, 5)
+        };
+      }
+      
+      function getSpotLightsPreset() {
+        const bg = [p.random(200, 255), p.random(200, 255), p.random(200, 255)];
+        return {
+          spacing: p.random(5, 20), // optimized from 2-20 to 5-20
+          background: bg,
+          color: ensureContrast(bg, randomBrightColor()),
+          stroke_weight: p.random(0.1, 5)
+        };
+      }
+      
+      // Load and generate typography
+      function generateTypography() {
+        drawing = false;
+        
+        // Get random font and color
+        currentFont = randomFont();
+        
+        // Get preset based on current example
+        switch(currentExample) {
+          case 'tentacles':
+            params = getTentaclesPreset();
+            break;
+          case 'scribble':
+            params = getScribblePreset();
+            seed = p.random(1000);
+            break;
+          case 'light_rays':
+            params = getLightRaysPreset();
+            break;
+          case 'spot_lights':
+            params = getSpotLightsPreset();
+            break;
+        }
+        
+        params.message = 'ateliernum';
+        params.size = 150;
+        params.font = currentFont;
+        
+        p.loadFont(currentFont, function(font) {
+          p5Font = font;
+          
+          p.textFont(p5Font);
+          p.textSize(params.size);
+          const bounds = p5Font.textBounds(params.message, 0, 0, params.size);
+          
+          const textWidth = bounds.w;
+          const textHeight = bounds.h;
+          
+          params.xoffset = (p.width - textWidth) / 2 - bounds.x;
+          params.yoffset = (p.height - textHeight) / 2 - bounds.y;
+          
+          f = new Rune.Font(currentFont);
+          f.load(function(err) {
+            if (err) {
+              console.error('Error loading font:', err);
+              return;
+            }
+            
+            path = f.toPath(params.message, 0, 0, params.size);
+            polys = path.toPolygons({ spacing: params.spacing });
+            
+            // Initialize example-specific data
+            switch(currentExample) {
+              case 'tentacles':
+                p.background(params.background || [0, 0, 0]);
+                initTentacles();
+                break;
+            }
+            
+            drawing = true;
+          });
+        });
+      }
+      
+      function initTentacles() {
+        tentacles = [];
+        for (let i = 0; i < polys.length; i++) {
+          let poly = polys[i];
+          for (let j = 0; j < poly.state.vectors.length; j++) {
+            let vec = poly.state.vectors[j];
+            tentacles.push(new Tentacle(
+              vec.x, vec.y,
+              params.tnoiseMultiplicator,
+              params.tminRandom,
+              params.tmaxRandom,
+              params.tdimStep
+            ));
+          }
+        }
+      }
+      
+      function Tentacle(x, y, noiseM, minRand, maxRand, dimStep) {
+        this.x = x;
+        this.y = y;
+        this.minRandom = minRand;
+        this.maxRandom = maxRand;
+        this.dimStep = dimStep;
+        this.size = p.random(this.minRandom, this.maxRandom);
+        this.angle = p.random(360);
+        this.radius = 0;
+        this.noiseFactor = p.random(500);
+        this.noiseMultiplicator = noiseM;
+        
+        this.draw = function() {
+          this.radius += 1;
+          this.angle = this.angle + p.noise(this.noiseFactor, 10) * this.noiseMultiplicator - this.noiseMultiplicator / 2;
+          this.size -= this.dimStep;
+          this.noiseFactor += 0.005;
+          
+          p.fill(params.color);
+          p.noStroke();
+          let drawX = this.x + this.radius * p.cos(p.radians(this.angle));
+          let drawY = this.y + this.radius * p.sin(p.radians(this.angle));
+          p.ellipse(drawX, drawY, this.size, this.size);
+          
+          if (this.size < 0) {
+            this.angle = p.random(360);
+            this.radius = 0;
+            this.noiseFactor = p.random(500);
+            this.size = p.random(this.minRandom, this.maxRandom);
+          }
+        };
+      }
+      
+      p.setup = function() {
+        let cnv = p.createCanvas(1024, 512);
+        cnv.id("typoCanvas");
+        cnv.hide();
+        
+        scribble = new window.Scribble(p);
+        anchorX = p.width / 2;
+        anchorY = p.height / 2;
+        
+       // p.background(0);
+       p.clear()
+        
+        document.getElementById('exampleSelect').addEventListener('change', function(e) {
+          currentExample = e.target.value;
+        });
+        
+        document.getElementById('generateBtn').addEventListener('click', function() {
+          generateTypography();
+        });
+      };
+      
+      p.draw = function() {
+        if (!drawing) return;
+        p.clear();
+       // p.background(params.background || [0, 0, 0]);
+        
+        switch(currentExample) {
+          case 'tentacles':
+            drawTentacles();
+            break;
+          case 'scribble':
+            drawScribble();
+            break;
+          case 'light_rays':
+            drawLightRays();
+            break;
+          case 'spot_lights':
+            drawSpotLights();
+            break;
+        }
+      }
+      
+      function drawTentacles() {
+        p.push();
+        p.translate(params.xoffset, params.yoffset);
+        for (let i = 0; i < tentacles.length; i++) {
+          tentacles[i].draw();
+        }
+        p.pop();
+      }
+      
+      function drawScribble() {
+        scribble.bowing = params.bowing;
+        scribble.roughness = params.roughness;
+        scribble.maxOffset = params.maxOffset;
+        p.randomSeed(seed);
+        
+        p.push();
+        p.translate(params.xoffset, params.yoffset);
+        p.strokeWeight(params.stroke_weight);
+        p.stroke(params.color);
+        
+        for (let i = 0; i < polys.length; i++) {
+          let poly = polys[i];
+          for (let j = 1; j < poly.state.vectors.length; j++) {
+            let vec1 = poly.state.vectors[j];
+            let vec2 = poly.state.vectors[j - 1];
+            p.noFill();
+            p.stroke(params.color);
+            p.strokeWeight(params.stroke_weight);
+            
+            if (params.shape === 0) {
+              scribble.scribbleLine(vec1.x, vec1.y, vec2.x, vec2.y);
+            } else if (params.shape === 1) {
+              scribble.scribbleEllipse(vec1.x, vec1.y, params.shape_size, params.shape_size);
+            } else if (params.shape === 2) {
+              scribble.scribbleRect(vec1.x, vec1.y, params.shape_size, params.shape_size);
+            }
+          }
+        }
+        p.pop();
+      }
+      
+      function drawLightRays() {
+        p.push();
+        p.translate(params.xoffset, params.yoffset);
+        p.strokeWeight(params.stroke_weight);
+        p.stroke(params.color);
+        
+        for (let i = 0; i < polys.length; i++) {
+          let poly = polys[i];
+          for (let j = 0; j < poly.state.vectors.length; j++) {
+            let vec = poly.state.vectors[j];
+            p.line(anchorX - params.xoffset, anchorY - params.yoffset, vec.x, vec.y);
+          }
+        }
+        p.pop();
+      }
+      
+      function drawSpotLights() {
+        p.push();
+        p.translate(params.xoffset, params.yoffset);
+        p.strokeWeight(params.stroke_weight);
+        p.stroke(params.color);
+        
+        for (let i = 0; i < polys.length; i++) {
+          let poly = polys[i];
+          for (let j = 0; j < poly.state.vectors.length; j++) {
+            let vec = poly.state.vectors[j];
+            let angle = p.atan2(vec.y - (anchorY - params.yoffset), vec.x - (anchorX - params.xoffset));
+            let len = p.random(50, 150);
+            let endX = vec.x + p.cos(angle) * len;
+            let endY = vec.y + p.sin(angle) * len;
+            p.line(vec.x, vec.y, endX, endY);
+          }
+        }
+        p.pop();
+      }
+      
+      p.mouseDragged = function() {
+        if (currentExample === 'light_rays' || currentExample === 'spot_lights') {
+          anchorX = p.mouseX;
+          anchorY = p.mouseY;
+        }
+      }
+    };
+    
+    new p5(sketch, "p5container");
+  </script>
+
+  <script>
+    AFRAME.registerComponent("typo-canvas", {
+      init() {
+        console.log('[typo-canvas] Initializing...');
+        setTimeout(() => {
+          const canvas = document.getElementById('typoCanvas');
+          if (canvas) {
+            console.log('[typo-canvas] Canvas found, setting as material source');
+            this.el.setAttribute("material", {src: "#typoCanvas"});
+          } else {
+            console.error('[typo-canvas] Canvas not found');
+          }
+        }, 500);
+      },
+      tick() {
+        const el = this.el;
+        const material = el.getObject3D("mesh").material;
+        if (!material.map) {
+          return;
+        }
+        material.map.needsUpdate = true;
+      }
+    });
+  </script>
+
+  <a-scene embedded
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best; changeMatrixMode: modelViewMatrix;"
+    vr-mode-ui="enabled: false"
+    renderer="sortObjects: true; antialias: true; colorManagement: true; physicallyCorrectLights; logarithmicDepthBuffer: true;"
+    smooth="true" smoothCount="5" smoothTolerance=".05" smoothThreshold="5" sourceWidth="800" sourceHeight="600"
+    displayWidth="1280" displayHeight="720">
+
+    <a-marker type="barcode" value="0">
+      <a-entity geometry="primitive: plane; height: 1; width: 2" material="side: double; shader: flat;" rotation="270 0 0" typo-canvas></a-entity>
+   
+    </a-marker>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  </a-scene>
+</body>
+</html>

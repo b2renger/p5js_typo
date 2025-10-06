@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+
+<head>
+  <script src="https://aframe.io/releases/1.2.0/aframe.min.js">
+
+  </script>
+  <script src="https://raw.githack.com/AR-js-org/AR.js/3.3.0/aframe/build/aframe-ar.js">
+
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.4.0/lib/p5.js"></script>
+</head>
+
+
+
+<body style="margin : 0px; overflow: hidden;">
+
+  <!-- hidden containers to run p5js programs-->
+  <div id="container"></div>
+  <!-- a p5js programm-->
+  <script>
+    // p5js sketch in instance mode - https://p5js.org/examples/instance-mode-instance-container.html
+    let sketch = function (p) {
+      let seed = p.random(9999)
+      p.setup = function () {
+        p.noCanvas();
+        let cnv = p.createCanvas(200, 200);
+        cnv.id("test"); // you need to set this because you'll use it in the a-frame component
+        cnv.hide();
+      };
+
+      p.draw = function () {
+        p.randomSeed(seed)
+        let step = 20
+        p.clear()
+        p.stroke(255, 0, 0)
+        p.strokeWeight(5)
+        for (let i = 0; i < p.width; i += step) {
+          for (let j = 0; j < p.height; j += step) {
+            p.stroke(p.random(255), p.random(255), p.random(255))
+            if (p.random(1) > 0.5) {
+              p.line(i, j, i + step, j + step)
+            }
+            else {
+              p.line(i, j + step, i + step, j)
+            }
+          }
+        }
+
+      };
+
+      p.mousePressed = function(){
+        seed = p.random(9999)
+      }
+    };
+    new p5(sketch, "container"); // bind the canvas to tge div just above this script
+  </script>
+  <!-- a custom aframe component to make a link between the p5js sketch and the Aframe scene-->
+  <script>
+    // aframe component "draw-canvas1" is used in our scene
+    AFRAME.registerComponent("draw-canvas1", {
+      init() {
+        setTimeout(() => {
+          this.el.setAttribute("material", {src: "#test"}); // every element of the scene that has this component will use the canvas ided as "test" for its texture
+        }, 500);
+      },
+      tick() {
+        var el = this.el;
+        var material;
+        material = el.getObject3D("mesh").material;
+        if (!material.map) {
+          // console.log("no material")
+          return;
+        } else {
+          // console.log("have material")
+        }
+        material.map.needsUpdate = true;
+      }
+    });
+  </script>
+
+<a-scene embedded
+    arjs="sourceType: webcam; detectionMode: mono_and_matrix; matrixCodeType: 3x3; trackingMethod: best ; changeMatrixMode: modelViewMatrix;"
+    vr-mode-ui="enabled: false"
+    renderer="sortObjects: true; antialias: true; colorManagement: true; physicallyCorrectLights; logarithmicDepthBuffer: true;"
+    smooth=" true" smoothCount="5" smoothTolerance=".05" smoothThreshold="5" sourceWidth="800" sourceHeight="600"
+    displayWidth="1280" displayHeight="720">
+
+    <a-marker type="barcode" value="0">
+      <a-box width="1" height="1" position="0 0 0" material="shader: flat;" draw-canvas1>
+      </a-box>
+
+    </a-marker>
+
+    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+
+  </a-scene>
+
+
+</body>
+
+</html>
